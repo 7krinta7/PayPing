@@ -1,0 +1,146 @@
+# =============================================================================
+# PayPing .gitignore
+# Node.js + MongoDB (Mongoose) project
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Dependencies
+# -----------------------------------------------------------------------------
+node_modules/
+jspm_packages/
+
+# -----------------------------------------------------------------------------
+# Environment & secrets
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# -----------------------------------------------------------------------------
+# Logs
+# -----------------------------------------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# -----------------------------------------------------------------------------
+# Build artifacts
+# -----------------------------------------------------------------------------
+# Node — no compile step, but cover transpiler output just in case
+dist/
+build/
+out/
+*.tsbuildinfo
+.next/
+.nuxt/
+.vuepress/dist/
+
+# Frontend build output (for when a client/ is added later)
+client/dist/
+client/build/
+public/
+
+# Coverage / test artifacts
+coverage/
+.nyc_output/
+*.lcov
+
+# Cache directories
+.eslintcache
+.cache/
+.parcel-cache/
+.turbo/
+.stylelintcache
+
+# -----------------------------------------------------------------------------
+# Runtime / process data
+# -----------------------------------------------------------------------------
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# -----------------------------------------------------------------------------
+# Editors & IDEs
+# -----------------------------------------------------------------------------
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains (WebStorm, IntelliJ)
+.idea/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim / Emacs
+*.swp
+*.swo
+*~
+.\#*
+
+# Cursor / Claude Code agent data
+.cursor/
+.aider*
+.claude/
+.continue/
+
+# -----------------------------------------------------------------------------
+# OS files
+# -----------------------------------------------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+$RECYCLE.BIN/
+Desktop.ini
+System Volume Information/
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.Trash-*
+
+# -----------------------------------------------------------------------------
+# MongoDB (local data dumps / exports — repo shouldn't carry these)
+# -----------------------------------------------------------------------------
+dump/
+mongodump/
+*.bson
+*.json.gz
+mongo-data/
+
+# -----------------------------------------------------------------------------
+# Misc
+# -----------------------------------------------------------------------------
+*.tgz
+.npm/
+.yarn/
+.pnp.*
