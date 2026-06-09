@@ -65,4 +65,24 @@ router.patch("/:id", auth, async (req, res) => {
   }
 });
 
+// DELETE CLIENT
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    const client = await Client.findOne({
+      _id: req.params.id,
+      user: req.userId
+    });
+
+    if (!client) {
+      return res.status(404).json({ message: "Client not found" });
+    }
+
+    await client.deleteOne();
+
+    res.json({ message: "Client deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;
