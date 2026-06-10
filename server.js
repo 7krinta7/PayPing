@@ -9,6 +9,7 @@ const userRoutes = require("./routes/user");
 
 const express = require("express");
 const connectDB = require("./config/db");
+const corsMiddleware = require("./config/cors");
 const auth = require("./middleware/auth");
 
 const app = express();
@@ -16,6 +17,7 @@ const app = express();
 (async () => {
   await connectDB();
 
+  app.use(corsMiddleware);
   app.use(express.json());
   app.use("/api/auth", authRoutes);
   app.use("/api/clients", clientRoutes);
