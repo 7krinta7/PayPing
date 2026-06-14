@@ -46,7 +46,6 @@ out/
 # Frontend build output (for when a client/ is added later)
 client/dist/
 client/build/
-public/
 
 # Coverage / test artifacts
 coverage/
