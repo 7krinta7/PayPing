@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-
-router.post("/signup", async (req, res) => {
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+router.post("/register", async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -11,18 +12,22 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // 👇 NO HASHING HERE ANYMORE
     const user = new User({ email, password });
     await user.save();
 
-    res.json({ message: "User created" });
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.json({ token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
-});
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+}); 
+
 
 router.post("/login", async (req, res) => {
   try {

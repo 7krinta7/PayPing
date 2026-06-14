@@ -1,0 +1,182 @@
+/* Base layout for the dashboard */
+.dashboard-layout {
+  display: grid;
+  grid-template-areas:
+    "navbar navbar"
+    "sidebar content";
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 60px 1fr;
+  min-height: 100vh;
+  font-family: 'Arial', sans-serif;
+  color: #333;
+}
+
+/* Top Navigation Bar */
+.top-navbar {
+  grid-area: navbar;
+  background-color: #2c3e50; /* Dark blue */
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.navbar-user-info {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-user-info span {
+  margin-right: 15px;
+}
+
+.logout-button {
+  background-color: #e74c3c; /* Red */
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #c0392b;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+  grid-area: sidebar;
+  background-color: #34495e;
+  color: white;
+  width: 250px;
+  padding-top: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: width 0.3s ease;
+  overflow-x: hidden;
+}
+
+.dashboard-layout.sidebar-closed .sidebar {
+  width: 60px;
+}
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar nav li {
+  margin-bottom: 10px;
+}
+
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  text-decoration: none;
+  padding: 10px 16px;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.sidebar nav a:hover {
+  background-color: #4a627a;
+}
+
+.nav-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.sidebar nav a.active-link {
+  background-color: #1abc9c; /* Teal for active link */
+  font-weight: bold;
+}
+
+.dashboard-layout.sidebar-closed .sidebar nav a {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.dashboard-layout.sidebar-closed .nav-label {
+  display: none;
+}
+
+
+/* Main Content Area */
+.content-area {
+  grid-area: content;
+  background-color: #ecf0f1; /* Light gray background */
+  padding: 20px;
+  overflow-y: auto; /* Enable scrolling for content */
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8em;
+  cursor: pointer;
+  padding: 0 10px;
+  margin-right: 10px;
+  transition: color 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+  color: #1abc9c;
+}
+
+/* Basic responsiveness */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    grid-template-areas:
+      "navbar"
+      "sidebar"
+      "content";
+    grid-template-columns: 1fr;
+    grid-template-rows: 60px auto 1fr; /* Sidebar height auto for mobile */
+  }
+
+  .sidebar {
+    width: 100%; /* Full width for sidebar on mobile */
+    height: auto; /* Allow sidebar to take natural height */
+    padding-top: 0;
+  }
+
+  .dashboard-layout.sidebar-closed .sidebar {
+    height: 0;
+    overflow: hidden;
+  }
+
+  .sidebar nav ul {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  .sidebar nav li {
+    margin-bottom: 0;
+  }
+
+  .sidebar nav a {
+    padding: 10px 15px;
+    text-align: center;
+  }
+
+  .dashboard-layout.sidebar-closed .sidebar-toggle {
+    display: block; /* Show toggle on mobile */
+  }
+
+  .navbar-user-info span {
+    display: none; /* Hide welcome text on small screens */
+  }
+}
