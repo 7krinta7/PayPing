@@ -1,0 +1,88 @@
+.invoice-list {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.invoice-table thead {
+  background: #f9fafb;
+}
+
+.invoice-table th,
+.invoice-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.invoice-table th {
+  font-weight: 600;
+  color: #374151;
+}
+
+.invoice-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.invoice-table tbody tr[aria-busy="true"] {
+  opacity: 0.6;
+}
+
+.invoice-table-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.invoice-table-actions-col {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.invoice-status {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.invoice-status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.invoice-status-paid {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.invoice-list-status {
+  padding: 1.5rem;
+  text-align: center;
+  color: #6b7280;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.invoice-list-error {
+  color: #dc2626;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.invoice-list-empty {
+  color: #6b7280;
+}

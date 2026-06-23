@@ -1,13 +1,16 @@
+require("dotenv").config();
 const cron = require("node-cron");
 const Invoice = require("../models/Invoice");
 const User = require("../models/User");
+const Client = require("../models/Client");
 const sendEmail = require("../utils/sendEmail");
 const sendWhatsApp = require("../utils/sendWhatsApp");
-
+const connectDB = require("../config/db");
+connectDB();
 console.log("✅ Reminder job file loaded");
 
 // Runs daily at 9 AM
-cron.schedule("* * * * *", async () => {
+cron.schedule("0 9 * * *", async () => {
   try {
     const now = new Date();
 
@@ -21,7 +24,7 @@ cron.schedule("* * * * *", async () => {
     }).populate("client", "name email");
 
     for (const invoice of overdueInvoices) {
-      console.log("DEBUG invoice.client =", invoice.client);
+      
 
       if (!invoice.client) {
   console.warn(
@@ -81,8 +84,7 @@ Due date: ${invoice.dueDate.toDateString()}
         user.entitlements?.whatsappReminders &&
         user.notificationPreferences?.whatsapp &&
         user.whatsappNumber &&
-        user.usage.whatsappThisMonth < WHATSAPP_MONTHLY_LIMIT
-      ) {
+(user.usage?.whatsappThisMonth || 0) < WHATSAPP_MONTHLY_LIMIT      ) {
         try {
           await sendWhatsApp(
             user.whatsappNumber,
@@ -104,8 +106,8 @@ Due date: ${invoice.dueDate.toDateString()}
             }
           );
 
-          user.usage.whatsappThisMonth += 1;
-          await user.save();
+    user.usage.whatsappThisMonth =(user.usage?.whatsappThisMonth || 0) + 1;
+            await user.save();
 
           sent = true;
         } catch (err) {
@@ -123,6 +125,7 @@ Due date: ${invoice.dueDate.toDateString()}
       }
 
       // 📧 EMAIL (fallback)
+      
       if (
         !sent &&
         user.entitlements?.emailReminders &&
