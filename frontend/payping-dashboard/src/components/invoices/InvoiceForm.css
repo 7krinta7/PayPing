@@ -1,68 +1,27 @@
+/* InvoiceForm: container-only styles. Field, label, input, button, and
+   error styles are provided globally via App.css using the
+   .invoice-form-field and .invoice-form-error hooks. */
+
 .invoice-form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--space-4);
   max-width: 480px;
-  padding: 1.5rem;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
+  padding: var(--space-6);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-5);
 }
 
 .invoice-form-field {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-}
-
-.invoice-form-field label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-}
-
-.invoice-form-field input,
-.invoice-form-field select,
-.invoice-form-field textarea {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  font-family: inherit;
-  background: #ffffff;
-  color: #111827;
-}
-
-.invoice-form-field input:focus,
-.invoice-form-field select:focus,
-.invoice-form-field textarea:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-}
-
-.invoice-form-field input:disabled,
-.invoice-form-field select:disabled,
-.invoice-form-field textarea:disabled {
-  background: #f3f4f6;
-  color: #6b7280;
-  cursor: not-allowed;
-}
-
-.invoice-form-field textarea {
-  resize: vertical;
-  min-height: 60px;
-}
-
-.invoice-form-error {
-  color: #dc2626;
-  font-size: 0.8rem;
-  margin-top: 0.15rem;
+  gap: var(--space-1);
 }
 
 .invoice-form-actions {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
 }

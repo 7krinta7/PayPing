@@ -12,7 +12,7 @@ export default function ClientList({
   }
 
   if (error) {
-    return <div className="client-list-status client-list-error">{error}</div>;
+    return <div className="alert alert-error client-list-error client-list-status">{error}</div>;
   }
 
   if (!clients || clients.length === 0) {

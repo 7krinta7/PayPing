@@ -1,5 +1,213 @@
-/* App-level styles. Starter CSS removed; replaced with minimal layout
-   primitives for the auth pages and dashboard placeholder. */
+/* =========================================================================
+   Global component primitives — buttons, forms, alerts, utility classes.
+   Page- and component-specific styles live in their own CSS files and should
+   compose on these primitives.
+   ========================================================================= */
+
+/* ---- Buttons ----------------------------------------------------------- */
+
+button {
+  font-family: inherit;
+  font-size: var(--font-sm);
+  line-height: 1;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-family: inherit;
+  font-size: var(--font-sm);
+  font-weight: 500;
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text-heading);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn:hover:not(:disabled) {
+  background-color: var(--color-surface-subtle);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Auth submit buttons (no .btn class) are styled as primary directly. */
+button[type="submit"] {
+  padding: var(--space-2) var(--space-4);
+  font-weight: 500;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background-color: var(--color-primary);
+  color: var(--color-text-on-inverse);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+button[type="submit"]:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-on-inverse);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: var(--color-text-on-inverse);
+}
+
+.btn-secondary {
+  background-color: var(--color-surface);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-surface-subtle);
+  border-color: var(--color-border-strong);
+}
+
+.btn-danger {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+  color: var(--color-text-on-inverse);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+  color: var(--color-text-on-inverse);
+}
+
+.btn-sm {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-xs);
+}
+
+/* ---- Form fields (label + input/select/textarea) ----------------------- */
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.form-field > label,
+.client-form-field > label,
+.invoice-form-field > label {
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--color-text-heading);
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea,
+.client-form-field input,
+.invoice-form-field input,
+.invoice-form-field select,
+.invoice-form-field textarea,
+.auth-form input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-family: inherit;
+  font-size: var(--font-sm);
+  color: var(--color-text-heading);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-field textarea,
+.invoice-form-field textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus,
+.client-form-field input:focus,
+.invoice-form-field input:focus,
+.invoice-form-field select:focus,
+.invoice-form-field textarea:focus,
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.form-field input:disabled,
+.form-field select:disabled,
+.form-field textarea:disabled,
+.client-form-field input:disabled,
+.invoice-form-field input:disabled,
+.invoice-form-field select:disabled,
+.invoice-form-field textarea:disabled,
+.auth-form input:disabled {
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.form-error,
+.client-form-error,
+.invoice-form-error {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--font-xs);
+  color: var(--color-danger-text);
+}
+
+/* ---- Alerts ------------------------------------------------------------ */
+
+.alert {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-sm);
+}
+
+.alert-error {
+  background-color: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+  color: var(--color-danger-text);
+}
+
+/* ---- Utility ----------------------------------------------------------- */
+
+.muted {
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+}
+
+/* ---- Auth pages (login / register / 404) ------------------------------ */
 
 main {
   flex: 1;
@@ -7,56 +215,25 @@ main {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px;
+  padding: var(--space-6) var(--space-4);
   text-align: center;
 }
 
-h1 {
-  font-size: 36px;
-  margin: 0 0 16px;
-}
-
-a {
-  color: var(--accent);
-}
-
-button {
-  font: inherit;
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text-h);
-  cursor: pointer;
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-button[type='submit'] {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
-}
-
-/* Auth pages */
 .auth-page,
-.dashboard,
 .not-found {
   width: 100%;
   max-width: 360px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  align-items: center;
+  gap: var(--space-4);
+  align-items: stretch;
+  text-align: left;
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
   width: 100%;
   text-align: left;
 }
@@ -64,26 +241,12 @@ button[type='submit'] {
 .auth-form label {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 14px;
+  gap: var(--space-1);
+  font-size: var(--font-sm);
+  color: var(--color-text-heading);
+  font-weight: 500;
 }
 
-.auth-form input {
-  font: inherit;
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text-h);
-}
-
-.form-error {
-  color: #c0392b;
-  font-size: 14px;
-  margin: 0;
-}
-
-.muted {
-  color: var(--text);
-  font-size: 14px;
+.auth-form button {
+  margin-top: var(--space-2);
 }

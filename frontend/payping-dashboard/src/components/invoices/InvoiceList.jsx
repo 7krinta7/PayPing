@@ -15,7 +15,7 @@ export default function InvoiceList({
   }
 
   if (error) {
-    return <div className="invoice-list-status invoice-list-error">{error}</div>;
+    return <div className="alert alert-error invoice-list-error invoice-list-status">{error}</div>;
   }
 
   if (!invoices || invoices.length === 0) {

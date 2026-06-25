@@ -28,7 +28,7 @@ function DashboardLayout() {
         <div className="navbar-brand">PayPing Dashboard</div>
         <div className="navbar-user-info">
           <span>Welcome, {displayName}</span>
-          <button type="button" onClick={onLogout} className="logout-button">
+          <button type="button" onClick={onLogout} className="btn btn-danger btn-sm logout-button">
             Log out
           </button>
         </div>

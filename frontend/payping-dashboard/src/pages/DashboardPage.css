@@ -1,71 +1,62 @@
+/* DashboardPage: page-level layout for the stats grid. */
+
 .dashboard-page {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-5);
   text-align: left;
 }
 
 .dashboard-page-header h1 {
-  margin: 0 0 4px;
-  font-size: 1.75rem;
-  color: var(--text-h);
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-2xl);
+  color: var(--color-text-heading);
 }
 
 .dashboard-page-header .muted {
   margin: 0;
-  color: var(--text);
-  font-size: 0.95rem;
-}
-
-.dashboard-stats-error {
-  padding: 1rem 1.25rem;
-  border-radius: 8px;
-  border: 1px solid #fecaca;
-  background: #fef2f2;
-  color: #dc2626;
-  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
 }
 
 .dashboard-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .stat-card {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow:
-    rgba(0, 0, 0, 0.04) 0 1px 2px,
-    rgba(0, 0, 0, 0.04) 0 4px 6px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .stat-label {
-  font-size: 0.8rem;
+  font-size: var(--font-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text);
+  color: var(--color-text-muted);
 }
 
 .stat-value {
-  font-size: 1.85rem;
+  font-size: var(--font-2xl);
   font-weight: 700;
-  color: var(--text-h);
-  line-height: 1.1;
+  color: var(--color-text-heading);
+  line-height: var(--leading-tight);
   word-break: break-word;
 }
 
 .dashboard-stats-grid[aria-busy="true"] .stat-value {
-  color: #9ca3af;
+  color: var(--color-text-muted);
   font-weight: 500;
-  font-size: 1.1rem;
+  font-size: var(--font-md);
 }
 
 @media (max-width: 1024px) {
@@ -80,6 +71,6 @@
   }
 
   .stat-value {
-    font-size: 1.5rem;
+    font-size: var(--font-xl);
   }
 }

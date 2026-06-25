@@ -52,7 +52,7 @@ export default function DashboardPage() {
       </div>
 
       {error && (
-        <div className="dashboard-stats-error" role="alert">
+        <div className="alert alert-error dashboard-stats-error" role="alert">
           {error}
         </div>
       )}

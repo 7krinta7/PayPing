@@ -1,3 +1,6 @@
+/* InvoiceList: table styling. Status pills and shared status containers
+   live here; .btn-* styles come from App.css. */
+
 .invoice-list {
   width: 100%;
   overflow-x: auto;
@@ -6,27 +9,32 @@
 .invoice-table {
   width: 100%;
   border-collapse: collapse;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .invoice-table thead {
-  background: #f9fafb;
+  background-color: var(--color-surface-subtle);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .invoice-table th,
 .invoice-table td {
-  padding: 0.75rem 1rem;
+  padding: var(--space-3) var(--space-4);
   text-align: left;
-  font-size: 0.9rem;
-  border-bottom: 1px solid #e5e7eb;
+  font-size: var(--font-sm);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .invoice-table th {
   font-weight: 600;
-  color: #374151;
+  font-size: var(--font-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
 }
 
 .invoice-table tbody tr:last-child td {
@@ -37,9 +45,13 @@
   opacity: 0.6;
 }
 
+.invoice-table tbody tr:hover {
+  background-color: var(--color-surface-subtle);
+}
+
 .invoice-table-actions {
   display: flex;
-  gap: 0.4rem;
+  gap: var(--space-2);
   flex-wrap: wrap;
 }
 
@@ -50,39 +62,33 @@
 
 .invoice-status {
   display: inline-block;
-  padding: 0.15rem 0.55rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-xs);
   font-weight: 600;
   text-transform: capitalize;
 }
 
 .invoice-status-pending {
-  background: #fef3c7;
-  color: #92400e;
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-text);
 }
 
 .invoice-status-paid {
-  background: #d1fae5;
-  color: #065f46;
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
 }
 
 .invoice-list-status {
-  padding: 1.5rem;
+  padding: var(--space-5);
   text-align: center;
-  color: #6b7280;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.95rem;
-}
-
-.invoice-list-error {
-  color: #dc2626;
-  background: #fef2f2;
-  border-color: #fecaca;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-sm);
 }
 
 .invoice-list-empty {
-  color: #6b7280;
+  color: var(--color-text-muted);
 }

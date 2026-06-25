@@ -1,59 +1,69 @@
+/* ClientList: table styling. Status/empty/error messages are shared
+   visual patterns; .btn-* styles come from App.css. */
+
+.client-list {
+  width: 100%;
+}
+
 .client-list-status {
   text-align: center;
-  padding: 40px 20px;
-  color: #666;
-  font-size: 1rem;
+  padding: var(--space-6) var(--space-5);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
 }
 
 .client-list-error {
-  color: #e74c3c;
-  background-color: #fdecea;
-  border: 1px solid #e74c3c;
-  border-radius: 6px;
-  padding: 16px 20px;
+  /* inherits .alert-error via the markup using the .alert-error class */
 }
 
 .client-list-empty {
-  color: #888;
+  color: var(--color-text-muted);
   font-style: italic;
 }
 
 .client-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #fff;
-  border-radius: 6px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-sm);
 }
 
 .client-table thead {
-  background-color: #2c3e50;
-  color: #fff;
+  background-color: var(--color-surface-subtle);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .client-table th {
   text-align: left;
-  padding: 12px 16px;
+  padding: var(--space-3) var(--space-4);
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: var(--font-xs);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  color: var(--color-text-muted);
 }
 
 .client-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #eee;
-  font-size: 0.95rem;
-}
-
-.client-table tbody tr:hover {
-  background-color: #f5f7fa;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-sm);
+  color: var(--color-text);
 }
 
 .client-table tbody tr:last-child td {
   border-bottom: none;
 }
+
+.client-table tbody tr:hover {
+  background-color: var(--color-surface-subtle);
+}
+
 .client-table-actions-col {
   width: 180px;
   text-align: right;
@@ -62,19 +72,5 @@
 .client-table-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-}
-
-.btn-sm {
-  padding: 6px 12px;
-  font-size: 0.85rem;
-}
-
-.btn-danger {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.btn-danger:hover:not(:disabled) {
-  background-color: #c0392b;
+  gap: var(--space-2);
 }
