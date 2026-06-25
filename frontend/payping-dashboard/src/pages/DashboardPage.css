@@ -1,40 +1,132 @@
-/* DashboardPage: page-level layout for the stats grid. */
+/* =========================================================================
+   DashboardPage — premium SaaS home layout.
+   Reuses .stat-card / .stat-label / .stat-value from the original
+   dashboard styles, extended with icon and helper text.
+   ========================================================================= */
 
 .dashboard-page {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-6);
   text-align: left;
 }
 
-.dashboard-page-header h1 {
-  margin: 0 0 var(--space-1);
-  font-size: var(--font-2xl);
-  color: var(--color-text-heading);
+/* ---- Welcome section --------------------------------------------------- */
+
+.dashboard-home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-8) var(--space-10);
 }
 
-.dashboard-page-header .muted {
-  margin: 0;
-  color: var(--color-text-muted);
-  font-size: var(--font-sm);
+.dashboard-home-eyebrow {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
 }
+
+.dashboard-home-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-3xl);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.01em;
+  line-height: var(--leading-tight);
+}
+
+.dashboard-home-subtitle {
+  margin: 0;
+  font-size: var(--font-base);
+  color: var(--color-text-muted);
+}
+
+.dashboard-home-meta {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.dashboard-home-date {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* ---- Stats grid (extended) ------------------------------------------- */
 
 .dashboard-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
 
 .stat-card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.stat-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-1);
+}
+
+.stat-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+}
+
+.stat-card-icon-totalClients {
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.stat-card-icon-pendingInvoices {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.stat-card-icon-overdueInvoices {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.stat-card-icon-outstandingAmount {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
 }
 
 .stat-label {
@@ -43,14 +135,22 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-muted);
+  order: 1;
 }
 
 .stat-value {
-  font-size: var(--font-2xl);
+  font-size: var(--font-3xl);
   font-weight: 700;
   color: var(--color-text-heading);
   line-height: var(--leading-tight);
   word-break: break-word;
+  order: 2;
+}
+
+.stat-card-helper {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  order: 3;
 }
 
 .dashboard-stats-grid[aria-busy="true"] .stat-value {
@@ -59,18 +159,322 @@
   font-size: var(--font-md);
 }
 
+/* ---- Generic dashboard card ------------------------------------------- */
+
+.dashboard-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-6) var(--space-4);
+}
+
+.dashboard-card-header-padded {
+  padding: var(--space-6) var(--space-6) var(--space-4);
+}
+
+.dashboard-card-title {
+  margin: 0;
+  font-size: var(--font-md);
+  font-weight: 600;
+  color: var(--color-text-heading);
+  line-height: var(--leading-snug);
+}
+
+.dashboard-card-link-muted {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+/* ---- Quick Actions + Recent Activity (2:1 row) ------------------------ */
+
+.dashboard-home-split {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-5);
+}
+
+.dashboard-activity-card {
+  padding-bottom: var(--space-2);
+}
+
+.activity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 var(--space-2) var(--space-2);
+}
+
+.activity-row {
+  display: grid;
+  grid-template-columns: 12px 1fr auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  transition: background-color 0.15s ease;
+}
+
+.activity-row:hover {
+  background-color: var(--color-surface-subtle);
+}
+
+.activity-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.activity-text {
+  font-size: var(--font-sm);
+  color: var(--color-text-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.activity-amount {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.activity-time {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.dashboard-quick-actions {
+  padding-bottom: var(--space-6);
+}
+
+.quick-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 var(--space-6) var(--space-2);
+}
+
+.quick-action-btn {
+  width: 100%;
+  justify-content: center;
+  height: 44px;
+  font-size: var(--font-sm);
+  font-weight: 500;
+}
+
+/* ---- Upcoming Due Invoices table -------------------------------------- */
+
+.dashboard-reminders-card {
+  overflow: hidden;
+}
+
+.reminders-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.reminders-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.reminders-table thead {
+  background-color: var(--color-surface-subtle);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.reminders-table th,
+.reminders-table td {
+  padding: var(--space-3) var(--space-6);
+  text-align: left;
+  font-size: var(--font-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.reminders-table th {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-subtle);
+}
+
+.reminders-table td {
+  color: var(--color-text);
+}
+
+.reminders-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.reminders-table tbody tr:hover {
+  background-color: var(--color-surface-subtle);
+}
+
+.reminders-table-actions-col {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.reminders-status {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.reminders-status-pending {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.reminders-status-overdue {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.reminders-status-paid {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.reminders-action-btn {
+  height: 32px;
+  padding: 0 var(--space-3);
+}
+
+/* ---- Empty state ------------------------------------------------------- */
+
+.dashboard-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: var(--space-10) var(--space-6);
+  color: var(--color-text-muted);
+}
+
+.dashboard-empty-state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.dashboard-empty-state-title {
+  margin: 0;
+  font-size: var(--font-base);
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+.dashboard-empty-state-body {
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  max-width: 360px;
+  line-height: var(--leading-snug);
+}
+
+.dashboard-card-padded {
+  margin: 0 var(--space-6) var(--space-6);
+}
+
+/* ---- Skeleton rows ---------------------------------------------------- */
+
+.reminders-skeleton {
+  display: block;
+  height: 12px;
+  width: 80%;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-subtle) 0%,
+    var(--color-border) 50%,
+    var(--color-surface-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: reminders-skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes reminders-skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---- Responsive -------------------------------------------------------- */
+
 @media (max-width: 1024px) {
   .dashboard-stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .dashboard-home-split {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-home-header {
+    padding: var(--space-6) var(--space-8);
+  }
+
+  .reminders-table th,
+  .reminders-table td {
+    padding: var(--space-3) var(--space-4);
+  }
 }
 
-@media (max-width: 540px) {
+@media (max-width: 640px) {
+  .dashboard-home-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-6);
+  }
+
+  .dashboard-home-title {
+    font-size: var(--font-2xl);
+  }
+
   .dashboard-stats-grid {
     grid-template-columns: 1fr;
   }
 
   .stat-value {
-    font-size: var(--font-xl);
+    font-size: var(--font-2xl);
+  }
+
+  .reminders-table th,
+  .reminders-table td {
+    padding: var(--space-3);
+  }
+
+  /* Hide the amount column on small screens. */
+  .reminders-table th:nth-child(2),
+  .reminders-table td:nth-child(2) {
+    display: none;
   }
 }
