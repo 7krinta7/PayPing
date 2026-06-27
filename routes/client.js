@@ -3,35 +3,38 @@ const router = express.Router();
 const Client = require("../models/Client");
 const auth = require("../middleware/auth");
 
+const validate = require("../middleware/validate");
+const { createRules, updateRules } = require("../middleware/validators/clientValidators");
+const AppError = require("../utils/AppError");
+
 // CREATE CLIENT
-router.post("/", auth, async (req, res) => {
+router.post("/", auth, createRules, validate, async (req, res, next) => {
   try {
-    const client = new Client({
+    const client = await Client.create({
       user: req.userId,
-      name: req.body.name,
+      name: String(req.body.name).trim(),
       email: req.body.email,
       phone: req.body.phone
     });
 
-    await client.save();
-    res.json(client);
+    res.status(201).json(client);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    next(error);
   }
 });
 
 // GET ALL CLIENTS FOR USER
-router.get("/", auth, async (req, res) => {
+router.get("/", auth, async (req, res, next) => {
   try {
     const clients = await Client.find({ user: req.userId });
     res.json(clients);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    next(error);
   }
 });
 
 // EDIT CLIENT
-router.patch("/:id", auth, async (req, res) => {
+router.patch("/:id", auth, updateRules, validate, async (req, res, next) => {
   try {
     const client = await Client.findOne({
       _id: req.params.id,
@@ -39,14 +42,11 @@ router.patch("/:id", auth, async (req, res) => {
     });
 
     if (!client) {
-      return res.status(404).json({ message: "Client not found" });
+      throw new AppError(404, "Client not found");
     }
 
     if (req.body.name !== undefined) {
-      if (typeof req.body.name !== "string" || !req.body.name.trim()) {
-        return res.status(400).json({ message: "Name cannot be empty" });
-      }
-      client.name = req.body.name.trim();
+      client.name = String(req.body.name).trim();
     }
 
     if (req.body.email !== undefined) {
@@ -61,12 +61,12 @@ router.patch("/:id", auth, async (req, res) => {
 
     res.json({ message: "Client updated", client });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    next(error);
   }
 });
 
 // DELETE CLIENT
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", auth, async (req, res, next) => {
   try {
     const client = await Client.findOne({
       _id: req.params.id,
@@ -74,14 +74,14 @@ router.delete("/:id", auth, async (req, res) => {
     });
 
     if (!client) {
-      return res.status(404).json({ message: "Client not found" });
+      throw new AppError(404, "Client not found");
     }
 
     await client.deleteOne();
 
     res.json({ message: "Client deleted" });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    next(error);
   }
 });
 

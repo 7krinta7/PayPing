@@ -6,7 +6,7 @@ const Invoice = require("../models/Invoice");
 const auth = require("../middleware/auth");
 
 // GET DASHBOARD STATS
-router.get("/stats", auth, async (req, res) => {
+router.get("/stats", auth, async (req, res, next) => {
   try {
     const userId = new mongoose.Types.ObjectId(req.userId);
     const userFilter = { user: userId };
@@ -31,8 +31,7 @@ router.get("/stats", auth, async (req, res) => {
       outstandingAmount
     });
   } catch (error) {
-    console.error("DASHBOARD STATS ERROR:", error);
-    res.status(500).json({ message: "Server error" });
+    next(error);
   }
 });
 

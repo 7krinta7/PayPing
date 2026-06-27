@@ -1,0 +1,135 @@
+/* =========================================================================
+   ReminderOverviewStats — four-card stat row for the Reminders dashboard.
+
+   Layout mirrors .invoices-stat-card so the dashboard reads as one
+   product. New class names only; all colors / shadows / spacing come
+   from existing tokens.
+   ========================================================================= */
+
+.reminder-overview-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.reminder-overview-stat-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  animation: reminder-overview-stat-in 0.32s ease-out backwards;
+}
+
+.reminder-overview-stat-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-strong);
+}
+
+.reminder-overview-stat-card:nth-child(1) { animation-delay: 0ms; }
+.reminder-overview-stat-card:nth-child(2) { animation-delay: 40ms; }
+.reminder-overview-stat-card:nth-child(3) { animation-delay: 80ms; }
+.reminder-overview-stat-card:nth-child(4) { animation-delay: 120ms; }
+
+@keyframes reminder-overview-stat-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reminder-overview-stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+}
+
+.reminder-overview-stat-card-activeReminderRules .reminder-overview-stat-icon {
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.reminder-overview-stat-card-remindersSentToday .reminder-overview-stat-icon {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.reminder-overview-stat-card-failedDeliveries .reminder-overview-stat-icon {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.reminder-overview-stat-card-pendingInvoices .reminder-overview-stat-icon {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.reminder-overview-stat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.reminder-overview-stat-label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reminder-overview-stat-value {
+  margin: 0;
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reminder-overview-stat-helper {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reminder-overview-stats-error {
+  display: flex;
+}
+
+/* ---- Responsive ----------------------------------------------------- */
+
+@media (max-width: 1280px) {
+  .reminder-overview-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .reminder-overview-stats {
+    grid-template-columns: 1fr;
+  }
+}

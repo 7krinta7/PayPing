@@ -1,0 +1,232 @@
+/* =========================================================================
+   EmailTemplateCard — Settings card for the user-customisable reminder
+   email template.
+
+   Reuses .settings-card / .settings-card-header / .settings-row-stacked
+   / .settings-text-input / .btn / .alert / .settings-card-footer
+   primitives from SettingsPage.css so the surface treatment is
+   identical to the rest of the Settings page. No new tokens are
+   introduced; the textarea reuses the same border + focus styles as
+   the .settings-text-input, and the new layout classes only describe
+   the editor / sidebar / preview arrangement that this card adds.
+   ========================================================================= */
+
+.email-template-card-body {
+  /* The base .settings-card-body is a vertical flex column; keep that
+     rhythm and only extend it with the editor + preview sections. */
+  gap: var(--space-5);
+}
+
+.email-template-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.email-template-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+/* Body input is a textarea — keeps the same border, radius, focus
+   ring as the text input so the editor reads as one continuous
+   surface. The explicit height keeps the layout stable while the user
+   is typing without forcing a scroll on small viewports. */
+.email-template-body-input {
+  height: auto;
+  min-height: 220px;
+  padding: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--font-sm);
+  line-height: var(--leading-snug);
+  resize: vertical;
+}
+
+.email-template-actions {
+  /* Inherits .settings-card-footer-actions (right-aligned). Wrap onto
+     a second line on narrow viewports via the responsive block below. */
+  flex-wrap: wrap;
+}
+
+.email-template-test-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.email-template-test-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+}
+
+.email-template-test-btn:hover:not(:disabled) .email-template-test-icon {
+  color: var(--color-primary-hover);
+}
+
+/* ---- Sidebar (variables list) --------------------------------------- */
+
+.email-template-sidebar {
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.email-template-sidebar-title {
+  margin: 0;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.email-template-var-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.email-template-var-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.email-template-var-token {
+  font-family: var(--font-mono);
+  font-size: var(--font-xs);
+  color: var(--color-text-heading);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  align-self: flex-start;
+}
+
+.email-template-var-desc {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+}
+
+/* ---- Preview panel -------------------------------------------------- */
+
+.email-template-preview {
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.email-template-preview-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.email-template-preview-eyebrow {
+  margin: 0;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+}
+
+.email-template-preview-helper {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+}
+
+.email-template-preview-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.email-template-preview-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.email-template-preview-subject {
+  margin: 0;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-heading);
+  line-height: var(--leading-snug);
+  word-break: break-word;
+}
+
+.email-template-preview-body {
+  margin: 0;
+  padding: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--font-sm);
+  color: var(--color-text-heading);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: var(--leading-snug);
+}
+
+.email-template-preview-empty {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* ---- Inline alerts (errors + success messages) ---------------------- */
+
+.email-template-alert {
+  margin: 0;
+  font-size: var(--font-xs);
+}
+
+/* ---- Responsive ----------------------------------------------------- */
+
+@media (max-width: 1024px) {
+  .email-template-editor {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .email-template-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .email-template-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .email-template-actions .btn {
+    width: 100%;
+  }
+}

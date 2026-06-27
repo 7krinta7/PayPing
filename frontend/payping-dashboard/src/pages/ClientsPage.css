@@ -1,0 +1,310 @@
+/* =========================================================================
+   ClientsPage — premium SaaS client management layout.
+   Composition: page header card → optional form → table card → summary grid.
+   ========================================================================= */
+
+.clients-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  text-align: left;
+}
+
+/* ---- Page header (matching dashboard-home-header) --------------------- */
+
+.clients-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-8) var(--space-10);
+}
+
+.clients-page-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.clients-page-eyebrow {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+}
+
+.clients-page-title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-3xl);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.02em;
+  line-height: var(--leading-tight);
+}
+
+.clients-page-subtitle {
+  margin: 0;
+  font-size: var(--font-base);
+  color: var(--color-text-muted);
+  max-width: 640px;
+}
+
+.clients-page-header-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.clients-page-add-btn {
+  height: 48px;
+  padding: 0 var(--space-6);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  gap: var(--space-2);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---- Premium table card ---------------------------------------------- */
+
+.clients-table-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.clients-table-card-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.clients-table-card-title {
+  margin: 0;
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--color-text-heading);
+  letter-spacing: -0.01em;
+}
+
+.clients-table-card-subtitle {
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+/* ---- Bottom summary cards (matching dashboard stat-card) -------------- */
+
+.clients-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--space-5);
+}
+
+.clients-summary-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.clients-summary-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.clients-summary-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-1);
+}
+
+.clients-summary-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+}
+
+.clients-summary-icon-primary {
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.clients-summary-icon-accent {
+  background-color: var(--color-avatar-3-bg);
+  color: var(--color-avatar-3-fg);
+}
+
+.clients-summary-label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.clients-summary-value {
+  font-size: var(--font-3xl);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  line-height: var(--leading-tight);
+}
+
+.clients-summary-helper {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+
+.clients-summary-helper-body {
+  font-size: var(--font-base);
+  color: var(--color-text);
+  line-height: var(--leading-snug);
+  max-width: 640px;
+}
+
+/* ---- Responsive ------------------------------------------------------ */
+
+@media (max-width: 1024px) {
+  .clients-page-header {
+    padding: var(--space-6) var(--space-8);
+  }
+
+  .clients-page-title {
+    font-size: var(--font-2xl);
+  }
+
+  .clients-table-card {
+    padding: var(--space-6);
+  }
+
+  .clients-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .clients-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-6);
+  }
+
+  .clients-page-title {
+    font-size: var(--font-2xl);
+  }
+
+  .clients-table-card {
+    padding: var(--space-5);
+  }
+}
+
+@media (max-width: 480px) {
+  .clients-page-title {
+    font-size: var(--font-xl);
+  }
+
+  .clients-page-subtitle {
+    font-size: var(--font-sm);
+  }
+
+  .clients-table-card {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+  }
+
+  .clients-summary-value {
+    font-size: var(--font-2xl);
+  }
+}
+
+/* ---- Toolbar: search ------------------------------------------------- */
+/* Mirrors the InvoicesPage toolbar styling so the two list pages read
+   the same way. Only the search field — Clients doesn't need the
+   status filter chips that Invoices uses. */
+.clients-toolbar {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.clients-toolbar-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  max-width: 480px;
+}
+
+.clients-toolbar-search-icon {
+  position: absolute;
+  left: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.clients-toolbar-search-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 var(--space-3) 0 36px;
+  font-family: inherit;
+  font-size: var(--font-sm);
+  color: var(--color-text-heading);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.clients-toolbar-search-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.clients-toolbar-search-input:hover {
+  border-color: var(--color-border-strong);
+}
+
+.clients-toolbar-search-input:focus {
+  outline: none;
+  background-color: var(--color-surface);
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.clients-toolbar-search-input:disabled {
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}

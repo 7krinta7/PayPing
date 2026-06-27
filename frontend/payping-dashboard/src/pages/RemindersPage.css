@@ -1,0 +1,144 @@
+/* =========================================================================
+   RemindersPage — Phase 8 dashboard layout.
+
+   Composed of:
+     1. Page header (eyebrow / title / subtitle / Manage CTA)
+     2. Overview stats (ReminderOverviewStats)
+     3. Two-column row (Recent Activity + Upcoming Queue)
+     4. Reminder Rules Preview
+
+   Reuses existing tokens — no new design language.
+   ========================================================================= */
+
+.reminders-dashboard-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  text-align: left;
+}
+
+/* ---- Page header ----------------------------------------------------- */
+
+.reminders-dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5) var(--space-8);
+}
+
+.reminders-dashboard-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.reminders-dashboard-header-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.reminders-dashboard-manage-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 40px;
+  padding: 0 var(--space-5);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.reminders-dashboard-manage-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reminders-dashboard-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+}
+
+.reminders-dashboard-eyebrow-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reminders-dashboard-title {
+  margin: 0;
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.02em;
+  line-height: var(--leading-tight);
+}
+
+.reminders-dashboard-subtitle {
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  max-width: 640px;
+}
+
+/* ---- Two-column row -------------------------------------------------- */
+
+.reminders-dashboard-split {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: var(--space-5);
+  align-items: stretch;
+}
+
+/* ---- Responsive ------------------------------------------------------ */
+
+@media (max-width: 1280px) {
+  .reminders-dashboard-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .reminders-dashboard-header {
+    padding: var(--space-5);
+  }
+}
+
+@media (max-width: 768px) {
+  .reminders-dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .reminders-dashboard-title {
+    font-size: var(--font-xl);
+  }
+
+  .reminders-dashboard-manage-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .reminders-dashboard-header {
+    padding: var(--space-4);
+  }
+}

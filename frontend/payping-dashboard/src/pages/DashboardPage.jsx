@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardStats } from '../services/dashboardService';
 import { getPendingInvoices } from '../services/invoiceService';
+import { formatApiError } from '../utils/errorMessage';
 import './DashboardPage.css';
 
 const STAT_CARDS = [
@@ -157,7 +158,7 @@ export default function DashboardPage() {
         const data = await getDashboardStats();
         if (!cancelled) setStats(data);
       } catch (err) {
-        if (!cancelled) setStatsError(err.response?.data?.message || 'Failed to load dashboard stats');
+        if (!cancelled) setStatsError(formatApiError(err, 'Failed to load dashboard stats'));
       } finally {
         if (!cancelled) setStatsLoading(false);
       }
@@ -176,7 +177,7 @@ export default function DashboardPage() {
         const data = await getPendingInvoices();
         if (!cancelled) setInvoices(Array.isArray(data) ? data : []);
       } catch (err) {
-        if (!cancelled) setInvoicesError(err.response?.data?.message || 'Failed to load invoices');
+        if (!cancelled) setInvoicesError(formatApiError(err, 'Failed to load invoices'));
       } finally {
         if (!cancelled) setInvoicesLoading(false);
       }

@@ -2,6 +2,34 @@
    Buttons inside the layout (logout, sidebar toggle) inherit from
    the global .btn system in App.css. */
 
+/* Skip link — visually hidden until focused. Lets keyboard users
+   jump past the navbar + sidebar straight to the main content. Same
+   pattern used in mainstream design systems; tokens reused. */
+.skip-link {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  z-index: 1100;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-on-inverse);
+  background-color: var(--color-primary);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform 0.15s ease;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+  color: var(--color-text-on-inverse);
+  text-decoration: none;
+}
+
 .dashboard-layout {
   display: grid;
   grid-template-areas:
@@ -56,11 +84,18 @@
   cursor: pointer;
   padding: 0 var(--space-2);
   margin-right: var(--space-2);
-  transition: color 0.15s ease;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .sidebar-toggle:hover {
   color: var(--color-primary);
+}
+
+.sidebar-toggle:focus-visible {
+  outline: none;
+  color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary);
 }
 
 /* Sidebar */
@@ -132,6 +167,13 @@
   background-color: var(--color-bg);
   padding: var(--space-5);
   overflow-y: auto;
+}
+
+/* `tabIndex={-1}` on the <main> lets the skip link hand focus to it.
+   Strip the default outline so the focus ring isn't visually noisy on
+   a programmatic focus jump. */
+.content-area:focus {
+  outline: none;
 }
 
 /* Mobile responsiveness (preserved from original). */

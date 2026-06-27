@@ -10,11 +10,29 @@ main.login-page {
   width: 100%;
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 55fr 45fr;
+  /* Proportional split: the marketing column gets ~1.2× the share of
+     the form column. Generous outer page padding (scaling with
+     viewport via clamp) keeps the columns from stretching to the
+     viewport edge while the proportional split gives the marketing
+     block slightly more visual weight. No hard-coded pixel widths
+     on either column — everything scales with the viewport. */
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   align-items: stretch;
   justify-content: stretch;
   text-align: left;
-  padding: 0;
+  /* Outer page margins that scale with viewport (16px on phones,
+     ~6vw on wide desktops, capped at 96px) so the composition reads
+     as a contained card-on-page rather than a wall-to-wall banner.
+     Both sides share the same horizontal margin so the columns stay
+     visually balanced. */
+  padding: clamp(var(--space-4), 4vw, var(--space-16))
+           clamp(var(--space-4), 6vw, var(--space-16));
+  /* Final polish: reduced gap upper bound from --space-12 to
+     --space-8 so the login card sits visually closer to the
+     marketing column on desktop, without resorting to
+     asymmetric per-side padding. Narrow viewports still get
+     --space-6 minimum. */
+  gap: clamp(var(--space-6), 2vw, var(--space-8));
   background: var(--gradient-auth);
 }
 
@@ -24,10 +42,34 @@ main.login-page {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: var(--space-16) var(--space-12);
-  gap: var(--space-10);
-  max-width: 720px;
-  margin: 0 auto;
+  align-items: flex-start; /* one vertical axis — every child hugs the left edge */
+  /* Internal padding scales with viewport: 32px on phones,
+     ~3vw on wide desktops. Lets the marketing block breathe
+     proportionally without hard-coded pixel widths. */
+  padding: clamp(var(--space-6), 3vw, var(--space-12))
+           clamp(var(--space-4), 2.5vw, var(--space-10));
+  /* Final polish: tightened gap upper bound from --space-5 to
+     --space-4 so the illustration visually attaches to the
+     headline block — the rhythm between headline → subtitle →
+     illustration now reads as one cohesive unit. Phone rhythm
+     (--space-3) and tablet rhythm preserved. */
+  gap: clamp(var(--space-3), 1.6vw, var(--space-4));
+  /* Comfortable maximum reading width via clamp — caps the marketing
+     content so it never balloons to fill the full viewport width
+     on huge monitors, but scales smoothly with the grid track.
+     100% keeps it fluid on narrow viewports. */
+  max-width: min(100%, 38rem);
+  margin: 0;
+  /* Decorative mint blob — anchored to the LEFT edge of the marketing
+     column (0% horizontal) so it visually originates BEHIND the
+     logo / headline. Same --color-primary-bg token, no new colors. */
+  background:
+    radial-gradient(
+      ellipse 75% 70% at 0% 12%,
+      var(--color-primary-bg) 0%,
+      transparent 60%
+    );
+  border-radius: var(--radius-2xl);
 }
 
 .login-logo {
@@ -54,61 +96,118 @@ main.login-page {
 }
 
 .login-headline {
-  font-size: var(--font-4xl);
+  /* Fluid hero type that scales with viewport size:
+     ~1.75rem on phones, scales up smoothly, capped at --font-3xl
+     (2.25rem) so it never grows past the existing token scale.
+     The marketing column's max-width drives natural wrapping into
+     "Simple invoicing. / Automated reminders. / Faster payments."
+     without any manual line breaks. */
+  font-size: clamp(1.75rem, 1.2rem + 2.2vw, var(--font-3xl));
   line-height: var(--leading-tight);
   font-weight: 700;
   color: var(--color-text-heading);
   margin: 0;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+  /* Allow long words to break naturally so the headline wraps
+     cleanly without overflow. */
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
+  width: 100%;
 }
 
 .login-headline-accent {
   color: var(--color-primary);
 }
 
-.login-illustration {
-  width: 100%;
-  height: 220px;
-  border-radius: var(--radius-xl);
-  background: linear-gradient(
-    135deg,
-    var(--color-surface) 0%,
-    var(--color-primary-bg) 100%
-  );
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.login-subtitle {
+  margin: 0;
+  font-size: var(--font-md);
   color: var(--color-text-muted);
-  font-size: var(--font-sm);
+  line-height: calc(var(--leading-relaxed) + 0.15);
+  /* Fills the marketing column width — parent .login-promo already
+     caps content at 38rem, so no further constraint is needed. */
+  max-width: none;
+  width: 100%;
 }
 
+.login-illustration {
+  width: 100%;
+  /* Scales naturally inside the marketing column (capped at 38rem
+     by .login-promo). The image itself fills 100% of the wrapper via
+     .login-illustration-img, so it scales fluidly with the column on
+     any viewport. No hard-coded width on either the wrapper or the
+     image. */
+  max-width: none;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  display: block;
+}
+
+/* The illustration itself: scales to the wrapper width, preserves the
+   PNG's aspect ratio, and renders without distortion. `display: block`
+   removes the inline-image baseline gap so the image sits flush inside
+   the rounded wrapper. */
+.login-illustration-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* ---- Features row ------------------------------------------------------- */
+
 .login-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* Final polish: added small bottom padding so the row has
+     comfortable breathing room beneath it (the brief noted the
+     row sat too close to the viewport bottom). Item spacing and
+     styling unchanged. */
+  padding-bottom: var(--space-3);
+  gap: var(--space-4);
+}
+
+.login-feature {
   display: flex;
-  flex-wrap: wrap;
+  align-items: flex-start;
   gap: var(--space-3);
 }
 
-.login-feature-badge {
+.login-feature-icon {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-pill);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-heading);
-  font-size: var(--font-sm);
-  font-weight: 500;
-  box-shadow: var(--shadow-sm);
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary);
+  flex-shrink: 0;
 }
 
-.login-feature-badge-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--color-primary);
+.login-feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.login-feature-title {
+  margin: 0;
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.login-feature-desc {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
 }
 
 /* ---- Right: login card column ------------------------------------------ */
@@ -117,20 +216,48 @@ main.login-page {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-12) var(--space-10);
+  /* Symmetric, viewport-scaling padding. The card's closer-to-center
+     position comes from the proportional grid split
+     (1.2fr / 1fr), NOT from asymmetric per-side padding. */
+  padding: clamp(var(--space-6), 3vw, var(--space-12));
 }
 
 .login-card {
   width: 100%;
-  max-width: 440px;
+  /* Cap card width with clamp() — same fluid approach as the
+     marketing column's max-width. Stays within the existing
+     --space-* / --radius-* / --shadow-* token vocabulary. */
+  max-width: min(100%, 28rem);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-xl);
-  padding: var(--space-12);
+  /* Internal padding scales with viewport so the card reads as
+     comfortable at any width. */
+  padding: clamp(var(--space-6), 3vw, var(--space-12));
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+}
+
+.login-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+}
+
+.login-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
 }
 
 .login-card-title {
@@ -152,35 +279,123 @@ main.login-page {
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-6);
   width: 100%;
   text-align: left;
 }
 
-/* Override the global .auth-form label/input behavior inside the login card. */
-.login-form label {
+.login-field {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+}
+
+.login-field-label {
   font-size: var(--font-sm);
   color: var(--color-text-heading);
   font-weight: 500;
 }
 
-.login-form input {
-  height: 48px;
+/* Wrapper holds the icon + input + (optional) trailing button as one
+   bordered unit. Restructured from `position: absolute` icon + magic
+   padding-left on the input to a true flex layout: the icon and
+   (optional) toggle are real flex children with their own reserved
+   track, and the input fills the remaining space. The layout itself
+   guarantees no overlap between icons and text — no padding math. */
+.login-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  /* Input height scales with viewport — comfortable on desktop,
+     tappable on phones. Token-based: 3rem = 48px (the standard
+     touch-target minimum), scaling up to ~3.75rem on wide screens. */
+  height: clamp(3rem, 2.5rem + 1vw, 3.75rem);
   padding: 0 var(--space-4);
-  font-size: var(--font-base);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   background-color: var(--color-surface);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.login-form input:focus {
-  outline: none;
-  border-color: var(--color-primary);
+.login-input-wrap:hover {
+  border-color: var(--color-border-strong);
+}
+
+.login-input-wrap:focus-within {
+  border-color: var(--color-border-focus);
   box-shadow: 0 0 0 4px var(--color-primary-bg);
+}
+
+.login-input-icon {
+  /* Real flex child — sits in a reserved left slot so it cannot
+     overlap text. Vertically centered via the wrapper's
+     `align-items: center`. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.login-input {
+  /* Fills the remaining space inside .login-input-wrap (between the
+     icon slot on the left and the toggle slot on the right). No
+     padding-left magic number — the wrapper layout handles it. */
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--font-base);
+  color: var(--color-text-heading);
+}
+
+.login-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1;
+}
+
+.login-input:focus {
+  outline: none;
+}
+
+/* The password input needs no special right-padding now — the toggle
+   is a real flex sibling that occupies its own track. */
+.login-input-with-toggle {
+  padding-right: 0;
+}
+
+.login-input-toggle {
+  /* Real flex child — sits in a reserved right slot. Vertically
+     centered via the wrapper's `align-items: center`. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.login-input-toggle:hover {
+  color: var(--color-primary);
+  background-color: var(--color-surface-subtle);
+}
+
+.login-input-toggle:focus-visible {
+  outline: none;
+  color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
 }
 
 .login-form-options {
@@ -189,7 +404,10 @@ main.login-page {
   justify-content: space-between;
   font-size: var(--font-sm);
   color: var(--color-text-muted);
-  margin-top: calc(-1 * var(--space-2));
+  /* RC1 polish: instead of a negative margin pulling the row up, use a
+     positive top margin so the options row reads as a clearly separate
+     row below the password field rather than crowding against it. */
+  margin-top: var(--space-1);
 }
 
 .login-remember {
@@ -220,10 +438,22 @@ main.login-page {
 }
 
 .login-submit {
-  height: 52px;
+  /* Submit button height matches the input height for consistent
+     form rhythm. Scales with viewport via clamp(). */
+  height: clamp(3rem, 2.5rem + 1vw, 3.75rem);
   font-size: var(--font-base);
   font-weight: 600;
   border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.login-submit-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .login-error {
@@ -248,26 +478,49 @@ main.login-page {
   font-weight: 500;
 }
 
+/* ---- Register-only spacing tweaks --------------------------------------- */
+/* The Register card holds 4 fields vs Login's 2. To keep its overall
+   height visually balanced with the Login card, the form's
+   label-to-input gap and inter-field gap are tightened by a single
+   spacing step. These selectors ONLY match when `.register-form` is
+   present — they never apply to the Login page. Login's vertical
+   rhythm is untouched. */
+.register-form {
+  gap: var(--space-5);
+}
+
+.register-form .login-field {
+  gap: var(--space-1);
+}
+
 /* ---- Responsive -------------------------------------------------------- */
 
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
+  /* ≤1024px collapses the two-column split into a single stacked
+     column. The marketing block keeps its clamp-based max-width; the
+     form column re-centers as before. */
   main.login-page {
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr;
+    gap: var(--space-6);
+    padding: var(--space-6);
   }
 
   .login-promo {
-    padding: var(--space-10) var(--space-6);
-    gap: var(--space-6);
-    max-width: none;
+    padding: var(--space-8) var(--space-6);
+    gap: var(--space-5);
+    max-width: min(100%, 38rem);
+    margin: 0 auto;
   }
 
   .login-headline {
-    font-size: var(--font-3xl);
+    /* Tablet headline: cap the clamp()'s viewport term since vw is
+       still meaningful here. Keeps 3-line wrap, just smaller. */
+    font-size: clamp(1.625rem, 1rem + 2.4vw, 2rem);
   }
 
   .login-illustration {
-    height: 160px;
+    display: none;
   }
 
   .login-card-wrap {
@@ -276,16 +529,53 @@ main.login-page {
 
   .login-card {
     padding: var(--space-8);
-    max-width: 480px;
+    max-width: min(100%, 28rem);
+  }
+}
+
+@media (max-width: 960px) {
+  main.login-page {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: var(--space-6);
+    padding: var(--space-6);
+  }
+
+  .login-promo {
+    padding: var(--space-8) var(--space-6);
+    gap: var(--space-5);
+    max-width: min(100%, 38rem);
+    margin: 0 auto;
+  }
+
+  .login-headline {
+    font-size: clamp(1.625rem, 1rem + 2.4vw, 2rem);
+  }
+
+  /* .login-illustration is hidden by the ≤1024px breakpoint above. */
+
+  .login-card-wrap {
+    padding: var(--space-6);
+  }
+
+  .login-card {
+    padding: var(--space-8);
+    max-width: min(100%, 28rem);
   }
 }
 
 @media (max-width: 540px) {
+  main.login-page {
+    padding: var(--space-4);
+  }
+
   .login-promo {
-    padding: var(--space-8) var(--space-4);
+    padding: var(--space-6) var(--space-4);
+    border-radius: var(--radius-xl);
   }
 
   .login-headline {
+    /* Phone: smallest end of the scale. Existing token --font-2xl. */
     font-size: var(--font-2xl);
   }
 
@@ -298,5 +588,11 @@ main.login-page {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-2);
+  }
+
+  /* Features row collapses to a single column on narrow phones so the
+     icon + title + description stay readable. */
+  .login-features {
+    grid-template-columns: 1fr;
   }
 }

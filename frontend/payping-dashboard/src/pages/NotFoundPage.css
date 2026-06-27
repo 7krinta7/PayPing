@@ -1,0 +1,85 @@
+/* =========================================================================
+   NotFoundPage — full-page 404 screen.
+
+   Reuses the existing design system tokens (colors, radii, shadows,
+   buttons) — no new design language. Sized for the unauthenticated
+   viewport (no DashboardLayout chrome around it).
+   ========================================================================= */
+
+.not-found-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) var(--space-4);
+  background-color: var(--color-bg);
+  font-family: var(--font-sans);
+  color: var(--color-text);
+}
+
+.not-found-card {
+  width: 100%;
+  max-width: 440px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.not-found-eyebrow {
+  margin: 0;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.not-found-code {
+  margin: 0;
+  font-size: 72px;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.02em;
+}
+
+.not-found-title {
+  margin: 0;
+  font-size: var(--font-xl);
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+.not-found-body {
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  line-height: var(--leading-relaxed);
+  max-width: 320px;
+}
+
+.not-found-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+  margin-top: var(--space-3);
+}
+
+/* Mobile parity — keep the card comfortably readable on phones. */
+@media (max-width: 480px) {
+  .not-found-card {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .not-found-code {
+    font-size: 56px;
+  }
+}

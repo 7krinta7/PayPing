@@ -1,179 +1,47 @@
 require("dotenv").config();
+const validateEnv = require("../config/validateEnv");
+const logger = require("../utils/logger");
 const cron = require("node-cron");
-const Invoice = require("../models/Invoice");
-const User = require("../models/User");
-const Client = require("../models/Client");
-const sendEmail = require("../utils/sendEmail");
-const sendWhatsApp = require("../utils/sendWhatsApp");
 const connectDB = require("../config/db");
-connectDB();
-console.log("✅ Reminder job file loaded");
 
-// Runs daily at 9 AM
+// The cron worker doesn't need the auth secret, but it does need
+// Mongo + email creds to deliver reminders. Fail fast if any are
+// missing — better than silently doing nothing on the schedule.
+validateEnv(["MONGO_URI", "EMAIL_USER", "EMAIL_PASS"]);
+
+const {
+  runRuleBasedScheduler,
+  runLegacyOverdueScan
+} = require("../services/reminderScheduler");
+
+connectDB().then(() => {
+  logger.info("✅ Reminder job file loaded");
+});
+
+/**
+ * Runs daily at 9 AM.
+ *
+ * The cron body is intentionally tiny: it only schedules the two runners
+ * defined in `services/reminderScheduler.js`.
+ *
+ *   - runLegacyOverdueScan preserves the previous behaviour for users
+ *     who have never created a ReminderRule.
+ *   - runRuleBasedScheduler evaluates every (rule × pending invoice)
+ *     pair for users who have at least one rule, dedup via
+ *     ReminderHistory.
+ *
+ * `Promise.allSettled` keeps both runners independent: a failure in one
+ * does not block the other, and the cron tick still completes.
+ */
 cron.schedule("0 9 * * *", async () => {
-  try {
-    const now = new Date();
+  const results = await Promise.allSettled([
+    runLegacyOverdueScan(),
+    runRuleBasedScheduler()
+  ]);
 
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-
-    const overdueInvoices = await Invoice.find({
-      
-      status: "pending",
-      dueDate: { $lt: now }
-    }).populate("client", "name email");
-
-    for (const invoice of overdueInvoices) {
-      
-
-      if (!invoice.client) {
-  console.warn(
-    `⚠️ Skipping invoice ${invoice._id} — client missing`
-  );
-  continue;
-}
-
-      const user = await User.findById(invoice.user);
-      if (!user) continue;
-
-      // 🔁 Monthly WhatsApp usage reset (stateless)
-      const currentMonth = `${now.getFullYear()}-${now.getMonth() + 1}`;
-
-      if (user.usage?.billingMonth !== currentMonth) {
-        user.usage = {
-          whatsappThisMonth: 0,
-          billingMonth: currentMonth
-        };
-        await user.save();
-      }
-
-      // 🔒 ATOMIC LOCK — only one send per invoice per day
-      const lockResult = await Invoice.updateOne(
-        {
-          _id: invoice._id,
-          status: "pending",
-          $or: [
-            { lastReminderSentAt: { $exists: false } },
-            { lastReminderSentAt: { $lt: todayStart } }
-          ]
-        },
-        {
-          $set: { lastReminderSentAt: new Date() }
-        }
-      );
-
-      if (lockResult.modifiedCount === 0) continue;
-
-      const message = `
-Hi ${invoice.client.name},
-
-This is a reminder that ₹${invoice.amount} is pending.
-
-Due date: ${invoice.dueDate.toDateString()}
-
-– PayPing
-`;
-
-      let sent = false;
-
-      // 📲 WHATSAPP (priority)
-      const WHATSAPP_MONTHLY_LIMIT = 100;
-
-      if (
-        process.env.ENABLE_WHATSAPP === "true" &&
-        user.entitlements?.whatsappReminders &&
-        user.notificationPreferences?.whatsapp &&
-        user.whatsappNumber &&
-(user.usage?.whatsappThisMonth || 0) < WHATSAPP_MONTHLY_LIMIT      ) {
-        try {
-          await sendWhatsApp(
-            user.whatsappNumber,
-            `₹${invoice.amount} pending. Due ${invoice.dueDate.toDateString()}`
-          );
-
-          await Invoice.updateOne(
-            { _id: invoice._id },
-            {
-              $set: {
-                lastDeliveryStatus: "sent",
-                lastDeliveryChannel: "whatsapp",
-                lastDeliveryError: null
-              },
-              $inc: {
-                reminderCount: 1,
-                whatsappReminderCount: 1
-              }
-            }
-          );
-
-    user.usage.whatsappThisMonth =(user.usage?.whatsappThisMonth || 0) + 1;
-            await user.save();
-
-          sent = true;
-        } catch (err) {
-          await Invoice.updateOne(
-            { _id: invoice._id },
-            {
-              $set: {
-                lastDeliveryStatus: "failed",
-                lastDeliveryChannel: "whatsapp",
-                lastDeliveryError: err.message
-              }
-            }
-          );
-        }
-      }
-
-      // 📧 EMAIL (fallback)
-      
-      if (
-        !sent &&
-        user.entitlements?.emailReminders &&
-        user.notificationPreferences?.email &&
-        invoice.client.email
-      ) {
-        try {
-          await sendEmail(
-            invoice.client.email,
-            "Payment Reminder",
-            message
-          );
-
-          await Invoice.updateOne(
-            { _id: invoice._id },
-            {
-              $set: {
-                lastDeliveryStatus: "sent",
-                lastDeliveryChannel: "email",
-                lastDeliveryError: null
-              },
-              $inc: {
-                reminderCount: 1,
-                emailReminderCount: 1
-              }
-            }
-          );
-
-          sent = true;
-        } catch (err) {
-          await Invoice.updateOne(
-            { _id: invoice._id },
-            {
-              $set: {
-                lastDeliveryStatus: "failed",
-                lastDeliveryChannel: "email",
-                lastDeliveryError: err.message
-              }
-            }
-          );
-        }
-      }
-
-      if (sent) {
-        console.log(`✅ Reminder sent | invoice=${invoice._id}`);
-      }
+  for (const r of results) {
+    if (r.status === "rejected") {
+      console.error("❌ Reminder runner rejected:", r.reason);
     }
-  } catch (error) {
-    console.error("❌ Reminder job error:", error);
   }
 });

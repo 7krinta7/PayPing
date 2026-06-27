@@ -1,0 +1,165 @@
+/* =========================================================================
+   ReminderRulesPage — page-level layout for the Reminder Rules module.
+
+   This file preserves the prior .reminders-page scaffolding so the
+   CRUD UI is pixel-equivalent to its previous home at /reminders.
+   Reused tokens only — no new design language.
+   ========================================================================= */
+
+.reminders-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  text-align: left;
+}
+
+/* ---- Page header ----------------------------------------------------- */
+
+.reminders-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5) var(--space-8);
+}
+
+.reminders-page-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.reminders-page-header-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.reminders-page-add-btn {
+  height: 40px;
+  padding: 0 var(--space-5);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  gap: var(--space-2);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.reminders-page-eyebrow {
+  margin: 0;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+}
+
+.reminders-page-title {
+  margin: 0;
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.02em;
+  line-height: var(--leading-tight);
+}
+
+.reminders-page-subtitle {
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  max-width: 640px;
+}
+
+/* ---- Premium table card --------------------------------------------- */
+
+.reminders-table-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-4) var(--space-4) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  animation: reminders-card-in 0.32s ease-out 0.08s backwards;
+}
+
+@keyframes reminders-card-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reminders-table-card-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-3) var(--space-2);
+}
+
+.reminders-table-card-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.reminders-table-card-title {
+  margin: 0;
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.01em;
+}
+
+.reminders-table-card-subtitle {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+}
+
+/* ---- Responsive ------------------------------------------------------ */
+
+@media (max-width: 1024px) {
+  .reminders-page-header {
+    padding: var(--space-5);
+  }
+}
+
+@media (max-width: 768px) {
+  .reminders-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .reminders-page-title {
+    font-size: var(--font-xl);
+  }
+
+  .reminders-page-add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .reminders-table-card {
+    padding: var(--space-3);
+  }
+
+  .reminders-table-card-header {
+    padding: var(--space-2);
+  }
+}
+
+@media (max-width: 480px) {
+  .reminders-page-header {
+    padding: var(--space-4);
+  }
+}

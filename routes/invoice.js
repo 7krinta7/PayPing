@@ -3,10 +3,14 @@ const router = express.Router();
 const Invoice = require("../models/Invoice");
 const auth = require("../middleware/auth");
 
+const validate = require("../middleware/validate");
+const { createRules, updateRules } = require("../middleware/validators/invoiceValidators");
+const AppError = require("../utils/AppError");
+
 // CREATE INVOICE
-router.post("/", auth, async (req, res) => {
+router.post("/", auth, createRules, validate, async (req, res, next) => {
   try {
-    const invoice = new Invoice({
+    const invoice = await Invoice.create({
       user: req.userId,
       client: req.body.client,
       amount: req.body.amount,
@@ -14,15 +18,27 @@ router.post("/", auth, async (req, res) => {
       description: req.body.description
     });
 
-    await invoice.save();
-    res.json(invoice);
+    res.status(201).json(invoice);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    next(error);
+  }
+});
+
+// LIST INVOICES
+router.get("/", auth, async (req, res, next) => {
+  try {
+    const invoices = await Invoice.find({
+      user: req.userId
+    }).populate("client", "name email");
+
+    res.json(invoices);
+  } catch (error) {
+    next(error);
   }
 });
 
 // GET UNPAID INVOICES
-router.get("/pending", auth, async (req, res) => {
+router.get("/pending", auth, async (req, res, next) => {
   try {
     const invoices = await Invoice.find({
       user: req.userId,
@@ -31,13 +47,12 @@ router.get("/pending", auth, async (req, res) => {
 
     res.json(invoices);
   } catch (error) {
-    console.error("INVOICE LIST ERROR:", error);
-    res.status(500).json({ message: "Server error" });
+    next(error);
   }
 });
 
 // EDIT INVOICE
-router.patch("/:id", auth, async (req, res) => {
+router.patch("/:id", auth, updateRules, validate, async (req, res, next) => {
   try {
     const invoice = await Invoice.findOne({
       _id: req.params.id,
@@ -45,17 +60,14 @@ router.patch("/:id", auth, async (req, res) => {
     });
 
     if (!invoice) {
-      return res.status(404).json({ message: "Invoice not found" });
+      throw new AppError(404, "Invoice not found");
     }
 
     if (invoice.status === "paid") {
-      return res.status(400).json({ message: "Cannot edit a paid invoice" });
+      throw new AppError(400, "Cannot edit a paid invoice");
     }
 
     if (req.body.amount !== undefined) {
-      if (typeof req.body.amount !== "number" || req.body.amount <= 0) {
-        return res.status(400).json({ message: "Amount must be greater than 0" });
-      }
       invoice.amount = req.body.amount;
     }
 
@@ -71,12 +83,12 @@ router.patch("/:id", auth, async (req, res) => {
 
     res.json({ message: "Invoice updated", invoice });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    next(error);
   }
 });
 
 // MARK INVOICE PAID
-router.patch("/:id/pay", auth, async (req, res) => {
+router.patch("/:id/pay", auth, async (req, res, next) => {
   try {
     const invoice = await Invoice.findOne({
       _id: req.params.id,
@@ -84,7 +96,7 @@ router.patch("/:id/pay", auth, async (req, res) => {
     });
 
     if (!invoice) {
-      return res.status(404).json({ message: "Invoice not found" });
+      throw new AppError(404, "Invoice not found");
     }
 
     if (invoice.status === "paid") {
@@ -98,12 +110,12 @@ router.patch("/:id/pay", auth, async (req, res) => {
 
     res.json({ message: "Invoice marked paid", invoice });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    next(error);
   }
 });
 
 // DELETE INVOICE
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", auth, async (req, res, next) => {
   try {
     const invoice = await Invoice.findOne({
       _id: req.params.id,
@@ -111,14 +123,14 @@ router.delete("/:id", auth, async (req, res) => {
     });
 
     if (!invoice) {
-      return res.status(404).json({ message: "Invoice not found" });
+      throw new AppError(404, "Invoice not found");
     }
 
     await invoice.deleteOne();
 
     res.json({ message: "Invoice deleted" });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    next(error);
   }
 });
 

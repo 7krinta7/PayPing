@@ -1,0 +1,322 @@
+/* =========================================================================
+   ReminderRulesPreview — compact rules table for the dashboard.
+   ========================================================================= */
+
+.reminder-rules-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+/* ---- Card frame ------------------------------------------------------- */
+
+.reminder-rules-preview-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.reminder-rules-preview-card-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6) var(--space-3);
+}
+
+.reminder-rules-preview-card-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.reminder-rules-preview-card-title {
+  margin: 0;
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.01em;
+}
+
+.reminder-rules-preview-card-subtitle {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+
+.reminder-rules-preview-card-meta {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.reminder-rules-preview-card-meta-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 var(--space-2);
+  margin-left: var(--space-2);
+  font-size: var(--font-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-heading);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+/* ---- Table ------------------------------------------------------------ */
+
+.reminder-rules-preview-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border-top: 1px solid var(--color-border);
+}
+
+.reminder-rules-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 480px;
+}
+
+.reminder-rules-preview-table thead th {
+  text-align: left;
+  padding: var(--space-3) var(--space-6);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-subtle);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.reminder-rules-preview-table tbody td {
+  padding: var(--space-4) var(--space-6);
+  font-size: var(--font-sm);
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.reminder-rules-preview-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.reminder-rules-preview-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.reminder-rules-preview-table tbody tr:hover {
+  background-color: var(--color-surface-subtle);
+}
+
+.reminder-rules-preview-cell-rule {
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+.reminder-rules-preview-col-enabled {
+  width: 130px;
+  text-align: right;
+}
+
+/* ---- Offset chip ------------------------------------------------------ */
+
+.reminder-rules-preview-offset-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--space-3);
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+}
+
+.reminder-rules-preview-offset-chip-before {
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.reminder-rules-preview-offset-chip-on {
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-heading);
+  border: 1px solid var(--color-border);
+}
+
+.reminder-rules-preview-offset-chip-after {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+/* ---- Enabled pill ----------------------------------------------------- */
+
+.reminder-rules-preview-enabled-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.reminder-rules-preview-enabled-pill-on {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.reminder-rules-preview-enabled-pill-off {
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.reminder-rules-preview-enabled-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+
+/* ---- Empty state ------------------------------------------------------ */
+
+.reminder-rules-preview-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: var(--space-10) var(--space-6);
+  color: var(--color-text-muted);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-subtle);
+  margin: var(--space-4);
+}
+
+.reminder-rules-preview-empty-title {
+  margin: 0;
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.reminder-rules-preview-empty-body {
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  max-width: 380px;
+  line-height: var(--leading-snug);
+}
+
+/* ---- Error state ------------------------------------------------------ */
+
+.reminder-rules-preview-error-wrap {
+  padding: var(--space-4) var(--space-6) var(--space-6);
+}
+
+/* ---- Skeleton rows ---------------------------------------------------- */
+
+.reminder-rules-preview-skeleton-row td {
+  padding: var(--space-5) var(--space-6);
+}
+
+.reminder-rules-preview-skeleton {
+  display: block;
+  height: 12px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-subtle) 0%,
+    var(--color-border) 50%,
+    var(--color-surface-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: reminder-rules-preview-shimmer 1.4s ease-in-out infinite;
+}
+
+.reminder-rules-preview-skeleton-name   { width: 160px; }
+.reminder-rules-preview-skeleton-offset { width: 130px; height: 22px; border-radius: var(--radius-pill); }
+.reminder-rules-preview-skeleton-toggle { width: 80px;  height: 22px; border-radius: var(--radius-pill); }
+
+@keyframes reminder-rules-preview-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---- Footer / manage button ------------------------------------------ */
+
+.reminder-rules-preview-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-3) var(--space-6) var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.reminder-rules-preview-manage-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 36px;
+  padding: 0 var(--space-4);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+}
+
+.reminder-rules-preview-manage-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- Responsive ------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .reminder-rules-preview-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5) var(--space-3);
+  }
+
+  .reminder-rules-preview-table thead th,
+  .reminder-rules-preview-table tbody td {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+
+  .reminder-rules-preview-footer {
+    padding: var(--space-3) var(--space-5) var(--space-4);
+  }
+}
+
+@media (max-width: 480px) {
+  .reminder-rules-preview-table thead th,
+  .reminder-rules-preview-table tbody td {
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
+  }
+
+  .reminder-rules-preview-footer {
+    justify-content: stretch;
+  }
+
+  .reminder-rules-preview-manage-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

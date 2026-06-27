@@ -1,27 +1,986 @@
-/* InvoiceForm: container-only styles. Field, label, input, button, and
-   error styles are provided globally via App.css using the
-   .invoice-form-field and .invoice-form-error hooks. */
+/* =========================================================================
+   InvoiceForm — compact premium SaaS layout (Stripe / Linear / Vercel style).
 
-.invoice-form {
+   The form is rendered inline on the Invoices page. Designed to fit as much
+   content as possible above the fold:
+     - Compact single-row page header (with collapsible help link instead of
+       large info cards).
+     - Two-column body: Client Details (left) | Invoice Configuration (right).
+     - Full-width Automation & Reminders settings grid below.
+     - Sticky bottom action bar with Cancel / Save Draft / Create Invoice.
+   ========================================================================= */
+
+.invoice-form-page {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  max-width: 480px;
-  padding: var(--space-6);
+}
+
+/* ---- Compact page header ----------------------------------------------- */
+
+.invoice-form-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-4) var(--space-6);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.invoice-form-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.invoice-form-eyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-primary);
+}
+
+.invoice-form-title {
+  margin: 0;
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.invoice-form-subtitle {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+
+.invoice-form-header-meta {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.invoice-form-help-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 32px;
+  padding: 0 var(--space-3);
+  font-family: inherit;
+  font-size: var(--font-xs);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.invoice-form-help-trigger:hover {
+  color: var(--color-text-heading);
+  background-color: var(--color-surface-subtle);
+  border-color: var(--color-border-strong);
+}
+
+.invoice-form-help-trigger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+/* ---- Collapsible help section ----------------------------------------- */
+
+.invoice-form-help {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  margin-bottom: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.invoice-form-help-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.invoice-form-help-title {
+  margin: 0;
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-heading);
+}
+
+.invoice-form-help-list {
+  margin: 0;
+  padding-left: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--font-xs);
+  color: var(--color-text);
+  line-height: var(--leading-snug);
+}
+
+/* ---- Form card wrapper ------------------------------------------------- */
+
+.invoice-form-card-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.invoice-form-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ---- Two-column layout ------------------------------------------------- */
+
+.invoice-form-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: var(--space-5);
+}
+
+.invoice-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.invoice-form-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.invoice-form-section-title {
+  margin: 0;
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.005em;
+}
+
+.invoice-form-section-helper {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+
+.invoice-form-divider {
+  height: 1px;
+  background-color: var(--color-border);
+  border: 0;
+  margin: 0;
+}
+
+/* ---- Section 1: Searchable client selector ---------------------------- */
+
+.invoice-form-searchable-client {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.invoice-form-searchable-client-input {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  height: 40px;
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.invoice-form-searchable-client-input:hover {
+  border-color: var(--color-border-strong);
+}
+
+.invoice-form-searchable-client-input:focus-within {
+  border-color: var(--color-border-focus);
+  background-color: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.invoice-form-searchable-client-input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--font-sm);
+  color: var(--color-text-heading);
+  padding: 0;
+}
+
+.invoice-form-searchable-client-input input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.invoice-form-searchable-client-input input:disabled {
+  cursor: not-allowed;
+}
+
+.invoice-form-client-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-subtle);
+  padding: var(--space-1);
+}
+
+.invoice-form-client-empty {
+  margin: 0;
+  padding: var(--space-4);
+  text-align: center;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+
+.invoice-form-client-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: var(--radius-md);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.invoice-form-client-row:hover:not(:disabled) {
+  background-color: var(--color-primary-bg);
+  border-color: var(--color-primary-bg);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.invoice-form-client-row:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.invoice-form-client-row:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.invoice-form-client-row.is-selected {
+  background-color: var(--color-primary-bg);
+  border-color: var(--color-primary);
+}
+
+.invoice-form-client-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  user-select: none;
+  box-shadow: inset 0 0 0 1px var(--color-avatar-ring);
+}
+
+.invoice-form-client-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.invoice-form-client-row-name {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.invoice-form-client-row-email {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.invoice-form-client-row-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+/* ---- Selected client pill (compact, replaces list) -------------------- */
+
+.invoice-form-client-selected {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-primary);
+  background-color: var(--color-primary-bg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.invoice-form-client-selected .invoice-form-client-avatar {
+  width: 36px;
+  height: 36px;
+  font-size: var(--font-xs);
+}
+
+.invoice-form-client-selected-check {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+
+.invoice-form-client-selected-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.invoice-form-client-selected-name {
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.invoice-form-client-selected-email {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.invoice-form-client-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 2px;
+}
+
+.invoice-form-client-footer-helper {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+  text-align: right;
+}
+
+.invoice-form-client-footer-link {
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.invoice-form-client-footer-link:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+}
+
+.invoice-form-client-footer-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+  border-radius: var(--radius-sm);
+}
+
+.invoice-form-ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 32px;
+  padding: 0 var(--space-3);
+  font-family: inherit;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-primary);
+  background-color: transparent;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.invoice-form-ghost-btn:hover:not(:disabled) {
+  background-color: var(--color-primary-bg);
+  border-color: var(--color-primary);
+  border-style: solid;
+}
+
+.invoice-form-ghost-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.invoice-form-ghost-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Section 2: Invoice Configuration -------------------------------- */
+
+.invoice-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
 }
 
 .invoice-form-field {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
+  min-width: 0;
 }
 
-.invoice-form-actions {
+.invoice-form-field-wide {
+  grid-column: 1 / -1;
+}
+
+.invoice-form-field label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.invoice-form-input,
+.invoice-form-textarea {
+  width: 100%;
+  height: 40px;
+  font-family: inherit;
+  font-size: var(--font-sm);
+  color: var(--color-text-heading);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-3);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.invoice-form-textarea {
+  height: auto;
+  min-height: 84px;
+  padding: var(--space-3);
+  resize: vertical;
+  line-height: var(--leading-snug);
+}
+
+.invoice-form-input::placeholder,
+.invoice-form-textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.invoice-form-input:hover,
+.invoice-form-textarea:hover {
+  border-color: var(--color-border-strong);
+}
+
+.invoice-form-input:focus,
+.invoice-form-textarea:focus {
+  outline: none;
+  background-color: var(--color-surface);
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.invoice-form-input:disabled,
+.invoice-form-textarea:disabled {
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+/* ---- Amount input group (₹ prefix + numeric input) ------------------- */
+
+.invoice-form-amount-wrap {
   display: flex;
+  align-items: stretch;
+  width: 100%;
+  height: 40px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.invoice-form-amount-wrap:hover {
+  border-color: var(--color-border-strong);
+}
+
+.invoice-form-amount-wrap:focus-within {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+  background-color: var(--color-surface);
+}
+
+.invoice-form-amount-prefix {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 100%;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-subtle);
+  border-right: 1px solid var(--color-border);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  user-select: none;
+}
+
+.invoice-form-amount-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 var(--space-3);
+  font-family: inherit;
+  font-size: var(--font-sm);
+  color: var(--color-text-heading);
+  background-color: transparent;
+  border: 0;
+  outline: none;
+}
+
+.invoice-form-amount-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.invoice-form-amount-input:disabled {
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+/* When the input is disabled the whole group should look disabled. */
+.invoice-form-amount-wrap:has(.invoice-form-amount-input:disabled) {
+  background-color: var(--color-surface-subtle);
+  cursor: not-allowed;
+}
+
+/* ---- Status select with colored chip overlay -------------------------- */
+
+.invoice-form-status-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.invoice-form-status-wrap:hover {
+  border-color: var(--color-border-strong);
+}
+
+.invoice-form-status-wrap:focus-within {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.invoice-form-status-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--font-sm);
+  color: var(--color-text-heading);
+}
+
+.invoice-form-status-select:disabled {
+  cursor: not-allowed;
+}
+
+.invoice-form-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  height: 100%;
+  width: 100%;
+  border-radius: var(--radius-md);
+  font-size: var(--font-xs);
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+
+.invoice-form-status-chip-pending {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-text);
+}
+
+.invoice-form-status-chip-paid {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.invoice-form-status-chip-overdue {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.invoice-form-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+
+.invoice-form-status-chevron {
+  position: absolute;
+  right: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+/* ---- Automation & Reminders: settings grid ---------------------------- */
+
+.invoice-form-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-3);
-  margin-top: var(--space-2);
+}
+
+.invoice-form-setting-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.invoice-form-setting-card:hover:not(.is-disabled) {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.invoice-form-setting-card.is-disabled {
+  background-color: var(--color-surface-subtle);
+  opacity: 0.85;
+}
+
+.invoice-form-setting-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+}
+
+.invoice-form-setting-icon-mail {
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.invoice-form-setting-icon-wa {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.invoice-form-setting-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.invoice-form-setting-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+.invoice-form-setting-helper {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+}
+
+.invoice-form-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 var(--space-2);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-warning-text);
+  background-color: var(--color-warning-bg);
+  border-radius: var(--radius-pill);
+}
+
+/* ---- Toggle switch ---------------------------------------------------- */
+
+.invoice-form-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 22px;
+  padding: 0;
+  background-color: var(--color-border);
+  border: 0;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+}
+
+.invoice-form-toggle.is-on {
+  background-color: var(--color-primary);
+}
+
+.invoice-form-toggle.is-disabled {
+  cursor: not-allowed;
+}
+
+.invoice-form-toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s ease;
+}
+
+.invoice-form-toggle.is-on .invoice-form-toggle-knob {
+  transform: translateX(16px);
+}
+
+.invoice-form-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+/* ---- Sticky bottom action bar ----------------------------------------- */
+
+.invoice-form-action-bar {
+  position: sticky;
+  bottom: var(--space-4);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.invoice-form-action-bar-right {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.invoice-form-link {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 var(--space-2);
+  font-family: inherit;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.invoice-form-link:hover:not(:disabled) {
+  color: var(--color-text-heading);
+  background-color: var(--color-surface-subtle);
+}
+
+.invoice-form-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.invoice-form-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.invoice-form-secondary-btn,
+.invoice-form-primary-btn {
+  height: 36px;
+  padding: 0 var(--space-4);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+}
+
+/* ---- Inline error ----------------------------------------------------- */
+
+.invoice-form-error {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-xs);
+  font-weight: 500;
+  color: var(--color-danger-text);
+  background-color: var(--color-danger-bg);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  align-self: flex-start;
+}
+
+/* ---- Responsive ------------------------------------------------------- */
+
+@media (max-width: 1100px) {
+  .invoice-form-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .invoice-form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .invoice-form-card {
+    padding: var(--space-4);
+  }
+
+  .invoice-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-form-settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-form-action-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+
+  .invoice-form-action-bar-right {
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .invoice-form-help {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-form-setting-card {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .invoice-form-title {
+    font-size: var(--font-lg);
+  }
+
+  .invoice-form-card {
+    border-radius: var(--radius-lg);
+  }
+
+  .invoice-form-header {
+    padding: var(--space-4);
+  }
 }

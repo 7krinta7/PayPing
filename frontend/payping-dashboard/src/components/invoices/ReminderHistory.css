@@ -1,0 +1,340 @@
+/* =========================================================================
+   ReminderHistory — read-only audit table for /api/reminder-history.
+
+   Card-style container matches the other invoice surfaces
+   (.invoices-table-card, .clients-table-card). Uses the same token
+   vocabulary: --color-*, --space-*, --radius-*, --font-*, --shadow-*.
+   ========================================================================= */
+
+.reminder-history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ---- Card frame ------------------------------------------------------- */
+
+.reminder-history-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.reminder-history-card-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6) var(--space-3);
+}
+
+.reminder-history-card-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.reminder-history-card-title {
+  margin: 0;
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.01em;
+}
+
+.reminder-history-card-subtitle {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+
+.reminder-history-card-meta {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.reminder-history-card-meta-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 var(--space-2);
+  margin-left: var(--space-2);
+  font-size: var(--font-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-heading);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+/* ---- Table ------------------------------------------------------------ */
+
+.reminder-history-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border-top: 1px solid var(--color-border);
+}
+
+.reminder-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.reminder-history-table thead th {
+  text-align: left;
+  padding: var(--space-3) var(--space-6);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-subtle);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.reminder-history-table tbody td {
+  padding: var(--space-4) var(--space-6);
+  font-size: var(--font-sm);
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.reminder-history-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.reminder-history-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.reminder-history-table tbody tr:hover {
+  background-color: var(--color-surface-subtle);
+}
+
+.reminder-history-table tbody tr.is-failed {
+  /* Subtle danger wash so failed rows are easy to scan for without
+     overwhelming the rest of the table. Uses the existing danger-bg
+     token so we don't introduce a new colour. */
+  background-color: rgba(254, 242, 242, 0.55);
+}
+
+.reminder-history-table tbody tr.is-failed:hover {
+  background-color: var(--color-danger-bg);
+}
+
+/* Column widths. Status is small (badge); Rule gets the most room because
+   names vary the most in length. Error has the rest. */
+.reminder-history-col-status {
+  width: 110px;
+}
+
+.reminder-history-col-channel {
+  width: 110px;
+}
+
+.reminder-history-col-rule {
+  min-width: 160px;
+}
+
+.reminder-history-col-date {
+  width: 150px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.reminder-history-col-error {
+  min-width: 220px;
+}
+
+.reminder-history-cell-text-muted {
+  color: var(--color-text-muted);
+}
+
+/* ---- Status pill (mirrors .reminders-status-* token language) -------- */
+
+.reminder-history-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.reminder-history-status-sent {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.reminder-history-status-failed {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.reminder-history-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+
+/* ---- Channel chip ----------------------------------------------------- */
+
+.reminder-history-channel {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--space-3);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: var(--color-text);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+/* ---- Error message pill ---------------------------------------------- */
+
+.reminder-history-error {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-xs);
+  font-weight: 500;
+  color: var(--color-danger-text);
+  background-color: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  border-radius: var(--radius-md);
+  word-break: break-word;
+  line-height: var(--leading-snug);
+}
+
+.reminder-history-error-icon {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+/* ---- Empty state ------------------------------------------------------ */
+
+.reminder-history-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: var(--space-12) var(--space-6);
+  color: var(--color-text-muted);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-subtle);
+  margin: var(--space-4);
+}
+
+.reminder-history-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+  box-shadow: var(--shadow-sm);
+}
+
+.reminder-history-empty-title {
+  margin: 0;
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.reminder-history-empty-body {
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  max-width: 380px;
+  line-height: var(--leading-snug);
+}
+
+/* ---- Skeleton rows ---------------------------------------------------- */
+
+.reminder-history-skeleton-row td {
+  padding: var(--space-5) var(--space-6);
+}
+
+.reminder-history-skeleton {
+  display: block;
+  height: 12px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-subtle) 0%,
+    var(--color-border) 50%,
+    var(--color-surface-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: reminder-history-shimmer 1.4s ease-in-out infinite;
+}
+
+.reminder-history-skeleton-status { width: 70px;  height: 22px; border-radius: var(--radius-pill); }
+.reminder-history-skeleton-channel { width: 70px; height: 22px; border-radius: var(--radius-pill); }
+.reminder-history-skeleton-rule    { width: 160px; }
+.reminder-history-skeleton-date    { width: 110px; }
+.reminder-history-skeleton-sent     { width: 130px; }
+.reminder-history-skeleton-error   { width: 200px; }
+
+@keyframes reminder-history-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---- Responsive ------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .reminder-history-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5) var(--space-3);
+  }
+
+  .reminder-history-table thead th,
+  .reminder-history-table tbody td {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+}
+
+@media (max-width: 480px) {
+  .reminder-history-table thead th,
+  .reminder-history-table tbody td {
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
+  }
+
+  .reminder-history-col-error {
+    min-width: 180px;
+  }
+}

@@ -1,0 +1,54 @@
+# Files NOT shipped inside the Docker image — kept out of the build context.
+
+# Dependencies (re-installed inside the image via `npm ci`).
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build artifacts.
+dist/
+build/
+out/
+coverage/
+
+# Source control.
+.git/
+.gitignore
+
+# Local environment overrides — the image reads env from the orchestrator.
+.env
+.env.*
+!.env.example
+
+# Frontend — the API image is backend-only. The dashboard ships as a
+# separate static asset / SSR container in a real deploy.
+frontend/
+
+# Verification scripts (run locally during development, not in the image).
+scripts/
+
+# Tests.
+__tests__/
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Editor / OS noise.
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs.
+*.log
+logs/
+
+# Misc.
+README.md
+docs/
+.dockerignore
+Dockerfile
+docker-compose.yml

@@ -1,0 +1,37 @@
+# Local development stack — app + Mongo on a shared network.
+#
+# Production deploys should use a managed Mongo (Atlas, DocumentDB, ...)
+# and set MONGO_URI to its connection string in the deploy environment.
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: payping-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: payping-app
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      # Override MONGO_URI to point at the local mongo container.
+      MONGO_URI: mongodb://mongo:27017/payping
+    ports:
+      - "5000:5000"
+
+volumes:
+  mongo-data:

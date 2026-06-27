@@ -38,10 +38,19 @@
   --color-success-bg: #d1fae5;
   --color-success-text: #065f46;
 
+  /* ---- Avatar palette (initials backgrounds) -------------------------- */
+  --color-avatar-1-bg: #e0e7ff;
+  --color-avatar-1-fg: #3730a3;
+  --color-avatar-2-bg: #fce7f3;
+  --color-avatar-2-fg: #9d174d;
+  --color-avatar-3-bg: #cffafe;
+  --color-avatar-3-fg: #155e75;
+
   /* ---- Overlays (rgba) ------------------------------------------------- */
   --color-backdrop: rgba(15, 23, 42, 0.45);
   --color-overlay-hover: rgba(255, 255, 255, 0.08);
   --color-divider-subtle: rgba(0, 0, 0, 0.05);
+  --color-avatar-ring: rgba(15, 23, 42, 0.04);
 
   /* ---- Spacing scale (4px grid) ---------------------------------------- */
   --space-1: 4px;

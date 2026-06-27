@@ -1,72 +1,574 @@
-/* InvoiceList: table styling. Status pills and shared status containers
-   live here; .btn-* styles come from App.css. */
+/* =========================================================================
+   InvoiceList — premium SaaS table + mobile cards view.
+   Page-level layout styles live in InvoicesPage.css.
+   ========================================================================= */
+
+/* ---- List wrapper ---------------------------------------------------- */
 
 .invoice-list {
   width: 100%;
-  overflow-x: auto;
+  position: relative;
 }
 
-.invoice-table {
+/* ---- Scroll wrapper (enables sticky thead) -------------------------- */
+
+.invoice-table-scroll {
   width: 100%;
-  border-collapse: collapse;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
+  overflow-x: auto;
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.invoice-table-scroll .invoice-table {
+  border-radius: 0;
+  min-width: 820px;
+}
+
+/* ---- Skeleton loading ----------------------------------------------- */
+
+.invoice-list-skeleton-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.invoice-skeleton-row {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.invoice-skeleton-row:last-child {
+  border-bottom: none;
+}
+
+.invoice-skeleton-row td {
+  padding: var(--space-5) var(--space-5);
+}
+
+.invoice-skeleton-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.invoice-skeleton-avatar {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-subtle) 0%,
+    var(--color-border) 50%,
+    var(--color-surface-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: invoice-shimmer 1.4s ease-in-out infinite;
+}
+
+.invoice-skeleton-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.invoice-skeleton {
+  display: block;
+  height: 10px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-subtle) 0%,
+    var(--color-border) 50%,
+    var(--color-surface-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: invoice-shimmer 1.4s ease-in-out infinite;
+}
+
+.invoice-skeleton-name    { width: 140px; height: 12px; }
+.invoice-skeleton-email   { width: 200px; }
+.invoice-skeleton-amount  { width: 80px;  height: 14px; }
+.invoice-skeleton-date    { width: 90px; }
+.invoice-skeleton-badge   { width: 72px;  height: 22px; border-radius: var(--radius-pill); }
+.invoice-skeleton-action  { width: 64px;  height: 22px; margin-left: auto; border-radius: var(--radius-md); }
+
+@keyframes invoice-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---- Error state ----------------------------------------------------- */
+
+.invoice-list-error-wrap {
+  padding: var(--space-4) 0;
+}
+
+/* ---- Empty state ---------------------------------------------------- */
+
+.invoice-list-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: var(--space-12) var(--space-6);
+  color: var(--color-text-muted);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface-subtle);
+}
+
+.invoice-list-empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
   box-shadow: var(--shadow-sm);
 }
 
-.invoice-table thead {
-  background-color: var(--color-surface-subtle);
-  border-bottom: 1px solid var(--color-border);
+.invoice-list-empty-title {
+  margin: 0;
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--color-text-heading);
 }
 
-.invoice-table th,
-.invoice-table td {
-  padding: var(--space-3) var(--space-4);
-  text-align: left;
+.invoice-list-empty-body {
+  margin: 0;
   font-size: var(--font-sm);
-  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  max-width: 380px;
+  line-height: var(--leading-snug);
 }
 
-.invoice-table th {
-  font-weight: 600;
-  font-size: var(--font-xs);
+/* ---- Table ----------------------------------------------------------- */
+
+.invoice-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  /* Fixed layout so column widths stay stable regardless of cell content.
+     Each <col> below sets an explicit width; cells inherit it. */
+  table-layout: fixed;
+  background-color: var(--color-surface);
+}
+
+/* Sticky header — keeps column titles visible while scrolling long lists.
+   Uses a layered shadow for separation. Generous horizontal padding gives
+   the table a professional, finance-app feel. Higher font-weight + a
+   darker tone than the body copy so the column titles read as the
+   dominant signal in the table — reinforcing the table-first hierarchy. */
+.invoice-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  text-align: left;
+  padding: var(--space-4) var(--space-6);
+  font-weight: 700;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-muted);
+  letter-spacing: 0.08em;
+  color: var(--color-text-heading);
+  background-color: var(--color-surface-subtle);
+  border-bottom: 1px solid var(--color-border-strong);
+  white-space: nowrap;
+}
+
+.invoice-table thead th:first-child {
+  border-top-left-radius: var(--radius-lg);
+}
+
+.invoice-table thead th:last-child {
+  border-top-right-radius: var(--radius-lg);
+}
+
+/* Per-column header alignment matches the cell content beneath it so
+   the column titles line up with their data on the same vertical
+   axis. Client + Amount + Due Date + Status are left-aligned so the
+   Amount column reads visually with the surrounding text columns
+   rather than behaving like a spreadsheet. Actions is centered (icon
+   group). */
+.invoice-table thead th.invoice-table-name-col,
+.invoice-table thead th.invoice-table-amount-col,
+.invoice-table thead th.invoice-table-due-col,
+.invoice-table thead th.invoice-table-status-col {
+  text-align: left;
+}
+
+.invoice-table thead th.invoice-table-actions-col {
+  text-align: center;
+}
+
+.invoice-table tbody td {
+  padding: var(--space-4) var(--space-6);
+  font-size: var(--font-sm);
+  color: var(--color-text);
+  vertical-align: middle;
+  background-color: var(--color-surface);
+  /* Consistent row height baseline. Avatar + name + secondary fit in
+     ~40-44px, so we lock each cell at 63px and let the <tr>'s own
+     1px border-bottom finish the row at a clean 64px. This guarantees
+     a perfectly identical visible row height across every row — no
+     1–2px jumps. */
+  height: 63px;
+  box-sizing: border-box;
+}
+.invoice-table tbody tr {
+  /* Row-level separator guarantee. The cell border-bottom can be
+     visually interrupted when a cell is a flex container (e.g.
+     `.invoice-table-name-cell`) or when the row has a tinted
+     background. Painting the separator on the <tr> ensures it runs
+     continuously from the left edge of the table to the right edge for
+     every row. */
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.15s ease;
+  animation: invoice-row-in 0.32s ease-out backwards;
+}
+
+.invoice-table tbody tr:last-child {
+  border-bottom: none;
 }
 
 .invoice-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.invoice-table tbody tr[aria-busy="true"] {
-  opacity: 0.6;
+@keyframes invoice-row-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Subtle row hover — background color only. No transforms, no
+   per-element color shifts, no layout animation. */
 .invoice-table tbody tr:hover {
   background-color: var(--color-surface-subtle);
 }
 
-.invoice-table-actions {
-  display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
+.invoice-table tbody tr.is-orphan {
+  background-color: var(--color-surface-subtle);
 }
 
-.invoice-table-actions-col {
-  width: 1%;
+.invoice-table tbody tr.is-orphan:hover {
+  background-color: var(--color-surface);
+}
+
+/* ---- Name + avatar cell --------------------------------------------- */
+
+/* Client column gets the largest share — names, emails, and avatars
+   need room to breathe. Sized so the Amount column sits close to the
+   visible client content rather than floating far to the right. */
+.invoice-table-name-col {
+  width: 35%;
+}
+
+/* Client cells get tighter horizontal padding than the rest of the
+   table so the visible content (avatar + name + email) sits closer to
+   the right edge of the Client column. This pulls the Amount column
+   ~8–12px closer to the Client content without changing the overall
+   table width. Vertical padding stays in sync with the rest of the
+   table for consistent row height. */
+.invoice-table tbody td.invoice-table-name-cell {
+  padding-left: var(--space-4);
+  padding-right: var(--space-2);
+}
+
+.invoice-table-name-cell {
+    text-align: left;
+    vertical-align: middle;
+}
+
+.invoice-table-name-content {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+/* The client name cell now wraps the name+email block in a Link so the
+   whole client area acts as a row entry-point to the invoice detail
+   page. The Link itself is transparent — it only contributes the
+   cursor change — and the underlying NameCell component retains all
+   visual styling. */
+.invoice-table-name-link {
+  display: inline-flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease;
+}
+
+.invoice-table-name-link:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+.invoice-table-name-link:hover .invoice-name-text {
+  color: var(--color-primary);
+}
+
+.invoice-table-name-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.invoice-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: var(--font-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  user-select: none;
+  box-shadow: inset 0 0 0 1px var(--color-avatar-ring);
+}
+
+/* Muted avatar for invoices whose client record is missing. */
+.invoice-avatar-missing {
+  background-color: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.invoice-name-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  /* Prevent the secondary line from forcing the Client column wider
+     than its allotted share. The secondary text uses ellipsis for
+     overflow. */
+  max-width: 100%;
+  flex: 1 1 auto;
+}
+
+.invoice-name-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-heading);
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.invoice-name-text-muted {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.invoice-name-text-muted svg {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.invoice-name-secondary {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  opacity: 0.7;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: var(--leading-snug);
+  text-align: left;
+}
+
+.invoice-name-block-missing .invoice-name-secondary {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* ---- Invoice reference column --------------------------------------
+   TODO(re-invoice-column): These styles are retained for when the
+   backend exposes a real `invoiceNumber` field on the Invoice model.
+   The column itself is currently hidden in InvoiceList.jsx because we
+   do NOT want to render fabricated references derived from Mongo
+   ObjectIds. Re-enable the column by adding the <th>/<td> back AND
+   re-applying `.invoice-table-ref-col` to those cells once the
+   backend provides a real sequential invoice number. */
+.invoice-table-ref-col {
+  width: 96px;
+}
+
+.invoice-table-ref-cell {
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.invoice-status {
+.invoice-ref {
   display: inline-block;
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-pill);
-  font-size: var(--font-xs);
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.invoice-ref-mobile {
+  margin-top: 2px;
+  align-self: flex-start;
+}
+
+/* ---- Amount column --------------------------------------------------- */
+
+/* Proportional width (16%) — wide enough for any realistic INR value
+   including 7-digit figures with grouping separators (e.g.
+   "₹12,34,567.00") rendered with tabular numerals. Sits directly after
+   the Client column (no oversized gap) and is right-aligned in both
+   the header and the cells so ₹ values form a perfectly straight
+   vertical column. */
+.invoice-table-amount-col {
+  width: 15%;
+  text-align: right;
+}
+
+.invoice-table-amount-cell {
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  /* Prevent any wrap so a long amount (e.g. ₹12,34,56,789.00) cannot
+     push other columns out of alignment. */
+  overflow: hidden;
+  text-overflow: clip;
+  /* Tighter left padding pulls the right-aligned amount ~4–6px closer
+     to the Client column. Combined with the reduced right padding on
+     the Client cell, the total gap shrinks by ~12px. */
+  padding-left: var(--space-4);
+  padding-right: var(--space-6);
+}
+
+.invoice-amount-value {
+  display: inline-block;
+  font-size: var(--font-md);
   font-weight: 600;
+  color: var(--color-text-heading);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  /* Keep each amount on a single line so the column is a perfect
+     vertical stack. */
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+/* ---- Due Date column ------------------------------------------------- */
+
+/* Stable 16% of table width. Sized to comfortably fit long, locale-aware
+   date formats like "Sep 12, 2026" with tabular numerals. */
+.invoice-table-due-col {
+  text-align: left;
+  width: 15%;
+}
+
+.invoice-table-due-cell {
+    width: 15%;
+    padding: 16px;
+    text-align: left;
+}
+
+.invoice-due-cell {
+  display: block;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  white-space: nowrap;
+  font-weight: 500;
+  text-align: left;
+}
+
+.invoice-due-overdue {
+  color: var(--color-danger-text);
+  /* Weight kept identical to non-overdue dates so the colour is the
+     only signal of overdue status. No extra emphasis is added. */
+  font-weight: 500;
+}
+
+/* ---- Status badge ---------------------------------------------------- */
+
+/* Fixed ~150px width — gives the pill + dot a stable footprint
+   regardless of the status word ("pending", "paid", "overdue"). The
+   column is intentionally NOT center-aligned: badges are left-aligned
+   so every status pill starts at the same X coordinate and forms a
+   single, perfectly straight vertical column. */
+.invoice-table-status-col {
+  width: 150px;
+  text-align: left;
+}
+
+/* Consistent left/right padding matches the rest of the table body so
+   the badge's left edge sits at the same X position in every row. The
+   vertical centering is preserved so the badge stays at the visual
+   midline of the 64px row regardless of row content. */
+.invoice-table-status-cell {
+  width: 150px;
+  text-align: left;
+  padding-left: var(--space-6);
+  padding-right: var(--space-6);
+  vertical-align: middle;
+}
+
+/* Inner wrapper fills the cell and left-aligns the badge so it sits at
+   the column's leading edge. `width: 100%` keeps the wrapper in sync
+   with the cell's content box; `align-items: center` keeps the badge
+   vertically centered in the row. */
+.invoice-table-status-content {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+}
+.invoice-table-actions-cell {
+    text-align: center;
+    vertical-align: middle;
+}
+/* Minimum width guarantees every status badge — regardless of the
+   word it contains ("paid", "pending", "overdue") — occupies the same
+   visual width. Combined with `justify-content: center` on the
+   inline-flex badge, the dot + label sit perfectly centered. */
+.invoice-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 92px;
+  height: 28px;
+
+  gap: 6px;
+
+  padding: 0;
+  margin: 0;
+
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+
   text-transform: capitalize;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .invoice-status-pending {
@@ -79,16 +581,271 @@
   color: var(--color-success-text);
 }
 
-.invoice-list-status {
-  padding: var(--space-5);
+.invoice-status-overdue {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.invoice-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+
+/* ---- Icon-only action buttons --------------------------------------- */
+
+/* The actions column reserves a proportional (20%) width that always
+   fits the full icon stack (Edit + Pay + Delete) with their gaps plus
+   the surrounding horizontal padding. Mark Paid is hidden (not removed
+   from layout) for paid invoices so the column stays the same width
+   and the visible icons stay aligned with all other rows. The cell
+   uses flexbox so the action group sits centered regardless of which
+   buttons are visible. */
+.invoice-table-actions-col {
+  width: 18%;
+  min-width: 120px;
+  white-space: nowrap;
   text-align: center;
+}
+
+.invoice-table-actions-cell {
+    text-align: center;
+    vertical-align: middle;
+}
+/* The action group is always rendered as a flex row that fills the
+   full cell width so every row's icon group sits at the exact same X
+   coordinates. We rely on the `.is-hidden` modifier on the Mark Paid
+   button (rather than omitting the node) so the reserved column width
+   is preserved and the layout never shifts when an invoice transitions
+   to paid. */
+.invoice-table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+    height: 100%;
+    min-width: 96px;
+}
+
+/* Reserve the space that the Mark Paid button would normally take so
+   that hiding it (for paid invoices) does not collapse the column.
+   The button keeps its full size and is simply visually disabled. */
+.invoice-icon-btn.is-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.invoice-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background-color: transparent;
   color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  padding: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+.invoice-icon-btn:hover:not(:disabled) {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.invoice-icon-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+  border-color: var(--color-border-focus);
+}
+
+.invoice-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.invoice-icon-btn-edit:hover:not(:disabled) {
+  color: var(--color-text-heading);
+}
+
+.invoice-icon-btn-pay:hover:not(:disabled) {
+  color: var(--color-success-text);
+  background-color: var(--color-success-bg);
+  border-color: var(--color-success-bg);
+}
+
+.invoice-icon-btn-delete:hover:not(:disabled) {
+  color: var(--color-danger-text);
+  background-color: var(--color-danger-bg);
+  border-color: var(--color-danger-bg);
+}
+
+.invoice-icon-btn-spinner {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: invoice-spin 0.6s linear infinite;
+}
+
+@keyframes invoice-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- Mobile cards view (≤ 640px) ------------------------------------ */
+
+.invoice-cards {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.invoice-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  font-size: var(--font-sm);
+  box-shadow: var(--shadow-sm);
+  animation: invoice-row-in 0.32s ease-out backwards;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.invoice-list-empty {
+.invoice-card:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.invoice-card.is-orphan {
+  background-color: var(--color-surface-subtle);
+}
+
+.invoice-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.invoice-card-head-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.invoice-card-name-link {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.invoice-card-name-link:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+.invoice-card-name-link:hover .invoice-name-text {
+  color: var(--color-primary);
+}
+
+.invoice-card-name-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.invoice-card-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--color-surface-subtle);
+  border-radius: var(--radius-md);
+}
+
+.invoice-card-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.invoice-card-meta-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   color: var(--color-text-muted);
+}
+
+.invoice-card-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+@media (max-width: 640px) {
+  .invoice-table-scroll {
+    display: none;
+  }
+
+  .invoice-cards {
+    display: flex;
+  }
+}
+
+/* ---- Responsive (desktop) ------------------------------------------- */
+
+@media (max-width: 1024px) {
+  .invoice-table thead th,
+  .invoice-table tbody td {
+    padding: var(--space-3) var(--space-4);
+  }
+}
+
+@media (max-width: 768px) {
+  .invoice-table thead th,
+  .invoice-table tbody td {
+    padding: var(--space-3);
+  }
+
+  .invoice-table tbody td.invoice-table-name-cell {
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
+  }
+
+  .invoice-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: var(--font-xs);
+  }
+}
+
+@media (min-width: 641px) {
+  /* Hide mobile cards on tablet+ */
+  .invoice-cards {
+    display: none;
+  }
 }

@@ -1,0 +1,1051 @@
+/* =========================================================================
+   BillingPage — UI-only billing & subscription surface.
+
+   Visual language mirrors InvoicesPage / SettingsPage / RemindersPage:
+     - Same page flex column with --space-5 gap.
+     - Same header block (eyebrow / title / subtitle).
+     - Same card treatment: white surface, --color-border, --radius-xl,
+       --shadow-sm, --space-5 --space-6 padding.
+     - Status badges reuse the same colour tokens as .invoice-status-* so
+       paid / failed read identically across the product.
+     - "Coming Soon" pill reuses the same treatment as SettingsPage.
+
+   Every disabled control is styled with reduced opacity so the page
+   reads as a coherent product surface rather than a list of stubs.
+   No new design tokens.
+   ========================================================================= */
+
+.billing-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  text-align: left;
+}
+
+/* ---- Page header ----------------------------------------------------- */
+
+.billing-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5) var(--space-8);
+}
+
+.billing-page-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.billing-page-eyebrow {
+  margin: 0;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+}
+
+.billing-page-title {
+  margin: 0;
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.02em;
+  line-height: var(--leading-tight);
+}
+
+.billing-page-subtitle {
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  max-width: 640px;
+}
+
+/* ---- Card primitive -------------------------------------------------- */
+
+/* Single surface treatment reused across every card on the page so
+   Current Plan / Usage / Payment Method / Billing History / Available
+   Plans all read as one visual family. */
+.billing-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  animation: billing-card-in 0.32s ease-out 0.04s backwards;
+}
+
+@keyframes billing-card-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.billing-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.billing-card-title {
+  margin: 0;
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.01em;
+}
+
+.billing-card-subtitle {
+  margin: 0;
+  margin-top: 2px;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+
+.billing-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.billing-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.billing-card-footer-helper {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+}
+
+.billing-card-footer-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+/* ---- Top row grid (Current Plan + Usage) ---------------------------- */
+
+/* Two cards sit side-by-side on desktop. Equal minmax(0, 1fr) tracks so
+   both cards read as one rhythm. Collapses to a single column at tablet
+   breakpoint. */
+.billing-top-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+/* ---- Current Plan card ---------------------------------------------- */
+
+.billing-current-plan-body {
+  gap: var(--space-4);
+}
+
+.billing-current-plan-name-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.billing-current-plan-name {
+  margin: 0;
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.02em;
+  line-height: var(--leading-tight);
+}
+
+.billing-current-plan-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--space-3);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  background-color: var(--color-primary-bg);
+  border-radius: var(--radius-pill);
+}
+
+.billing-current-plan-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.billing-current-plan-price {
+  font-size: var(--font-3xl);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.billing-current-plan-cycle {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* Two-column metadata strip (Billing cycle / Next renewal). Reads as a
+   compact "facts about your plan" block without competing with the
+   price above. */
+.billing-current-plan-meta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.billing-current-plan-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.billing-current-plan-meta-item dt {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.billing-current-plan-meta-item dd {
+  margin: 0;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+/* ---- Status badge (Current Plan) ------------------------------------ */
+
+/* Mirrors .invoice-status-badge dimensions so the visual footprint
+   matches the rest of the dashboard. Active = primary brand colour
+   (green), failed = danger. */
+.billing-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  height: 28px;
+  gap: 6px;
+  padding: 0;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: capitalize;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.billing-status-badge-active {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.billing-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+
+/* ---- Usage card ------------------------------------------------------ */
+
+.billing-usage-body {
+  gap: var(--space-5);
+}
+
+.billing-usage-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.billing-usage-row-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.billing-usage-row-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+}
+
+.billing-usage-row-icon-primary {
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.billing-usage-row-icon-muted {
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+.billing-usage-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.billing-usage-row-label {
+  margin: 0;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+.billing-usage-row-helper {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+}
+
+/* Usage count "184 / 500" — right-aligned on the same row as the label.
+   Tabular numerals so the slash sits at a stable X position across all
+   rows and locales. */
+.billing-usage-row-count {
+  margin: 0;
+  flex-shrink: 0;
+  font-size: var(--font-sm);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.billing-usage-row-count-used {
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.billing-usage-row-count-sep {
+  color: var(--color-text-muted);
+  margin: 0 2px;
+}
+
+.billing-usage-row-count-quota {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* Progress bar track + fill. 8px tall, pill-shaped so the bar reads as
+   a single continuous unit. The fill uses --color-primary (the brand
+   teal) so active progress matches the brand identity. */
+.billing-usage-progress {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background-color: var(--color-border);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.billing-usage-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-text-muted);
+  transition: width 0.4s ease;
+}
+
+.billing-usage-progress-fill-primary {
+  background-color: var(--color-primary);
+}
+
+.billing-usage-progress-disabled {
+  opacity: 0.6;
+}
+
+.billing-usage-row-foot {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+
+.billing-usage-row-foot-muted {
+  opacity: 0.85;
+}
+
+/* ---- Coming Soon badge (Usage: WhatsApp) ---------------------------- */
+
+/* Same visual treatment as .settings-coming-soon-badge so the "Coming
+   Soon" pill reads identically across Settings + Billing. */
+.billing-coming-soon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  padding: 0 var(--space-3);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  flex-shrink: 0;
+}
+
+/* ---- Payment Method -------------------------------------------------- */
+
+.billing-payment-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.billing-payment-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.billing-payment-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.billing-payment-brand {
+  margin: 0;
+  font-size: var(--font-md);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.01em;
+}
+
+.billing-payment-detail {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+}
+
+.billing-payment-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.billing-payment-helper {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+}
+
+/* ---- Billing History table ------------------------------------------ */
+
+/* Table card uses heavier shadow + strong border so it reads as the
+   primary data surface on the page — same hierarchy as the invoices
+   table. */
+.billing-history-card {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-4);
+  gap: var(--space-3);
+}
+
+.billing-history-header {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.billing-history-body {
+  gap: 0;
+}
+
+.billing-history-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.billing-history-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  background-color: var(--color-surface);
+  min-width: 720px;
+}
+
+.billing-history-table thead th {
+  text-align: left;
+  padding: var(--space-4) var(--space-5);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-heading);
+  background-color: var(--color-surface-subtle);
+  border-bottom: 1px solid var(--color-border-strong);
+  white-space: nowrap;
+}
+
+.billing-history-table thead th:first-child {
+  border-top-left-radius: var(--radius-lg);
+}
+
+.billing-history-table thead th:last-child {
+  border-top-right-radius: var(--radius-lg);
+}
+
+.billing-history-table tbody td {
+  padding: var(--space-4) var(--space-5);
+  font-size: var(--font-sm);
+  color: var(--color-text);
+  vertical-align: middle;
+  background-color: var(--color-surface);
+  height: 63px;
+  box-sizing: border-box;
+}
+
+.billing-history-row {
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.15s ease;
+}
+
+.billing-history-row:last-child {
+  border-bottom: none;
+}
+
+.billing-history-row:hover {
+  background-color: var(--color-surface-subtle);
+}
+
+/* Column widths — proportional to the data they hold. Invoice # gets
+   the most room (it's the primary identifier), Amount is fixed for
+   currency alignment, Actions is sized to fit the Download button. */
+.billing-history-col-id {
+  width: 32%;
+}
+
+.billing-history-col-date {
+  width: 22%;
+}
+
+.billing-history-col-amount {
+  width: 18%;
+  text-align: left;
+}
+
+.billing-history-col-status {
+  width: 14%;
+  text-align: left;
+}
+
+.billing-history-col-actions {
+  width: 14%;
+  text-align: right;
+}
+
+.billing-history-col-amount .billing-history-amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--color-text-heading);
+  white-space: nowrap;
+}
+
+.billing-history-id {
+  display: inline-block;
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.billing-history-date {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+/* Status pills — paid = success tokens, failed = danger tokens. Same
+   dimensions as the Current Plan status badge so the page reads as one
+   visual family. */
+.billing-history-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 26px;
+  gap: 6px;
+  padding: 0;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: capitalize;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.billing-history-status-paid {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.billing-history-status-failed {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.billing-history-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+
+.billing-history-download {
+  height: 32px;
+  padding: 0 var(--space-3);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  gap: var(--space-2);
+  border-radius: var(--radius-md);
+}
+
+/* Right-align the Download button content so the icon + label sit at
+   the column's trailing edge. */
+.billing-history-col-actions .billing-history-download {
+  margin-left: auto;
+}
+
+/* ---- Mobile card list (≤ 640px) ------------------------------------- */
+
+/* Stacked card view that replaces the table on mobile. Hidden on
+   tablet+ via the media query below. */
+.billing-history-cards {
+  display: none;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.billing-history-card-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.billing-history-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.billing-history-card-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--color-surface-subtle);
+  border-radius: var(--radius-md);
+}
+
+.billing-history-card-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.billing-history-card-meta-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.billing-history-card-meta-value {
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.billing-history-download-full {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ---- Available Plans grid ------------------------------------------- */
+
+.billing-plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.billing-plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-5) var(--space-6);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.billing-plan:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Highlight tier — saturated brand-tinted background so it visually
+   pops above the other two without changing the surrounding rhythm.
+   The CTA inside is .btn-primary so the click target inherits the same
+   brand colour identity. */
+.billing-plan-highlight {
+  background-color: var(--color-primary-bg);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.billing-plan-highlight:hover {
+  border-color: var(--color-primary-hover);
+}
+
+/* Current plan — strong border + brand-tinted background so the user's
+   active tier is unmissable. Same brand-tinted treatment as
+   .billing-plan-highlight so the two visually-similar states read as
+   related. */
+.billing-plan-current {
+  background-color: var(--color-primary-bg);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.billing-plan-badge {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--space-3);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-pill);
+}
+
+.billing-plan-badge-highlight {
+  color: var(--color-text-on-inverse);
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.billing-plan-name {
+  margin: 0;
+  font-size: var(--font-lg);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.01em;
+  /* Top padding so the absolutely-positioned badge doesn't overlap the
+     plan name. */
+  padding-right: 90px;
+}
+
+.billing-plan-description {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+  min-height: 2.6em;
+}
+
+.billing-plan-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.billing-plan-highlight .billing-plan-price-row,
+.billing-plan-current .billing-plan-price-row {
+  border-top-color: rgba(13, 148, 136, 0.25);
+}
+
+.billing-plan-price {
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.billing-plan-period {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.billing-plan-features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+.billing-plan-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: var(--font-xs);
+  color: var(--color-text);
+  line-height: var(--leading-snug);
+}
+
+.billing-plan-feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background-color: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.billing-plan-highlight .billing-plan-feature-icon,
+.billing-plan-current .billing-plan-feature-icon {
+  background-color: var(--color-surface);
+}
+
+.billing-plan-feature-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.billing-plan-cta {
+  margin-top: var(--space-2);
+}
+
+.billing-plan-button {
+  width: 100%;
+  height: 40px;
+  padding: 0 var(--space-4);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  justify-content: center;
+}
+
+.billing-plans-helper {
+  margin: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+  text-align: center;
+}
+
+/* ---- Disabled controls ---------------------------------------------- */
+
+/* Matches the disabled treatment used across SettingsPage so any
+   disabled button on the page reads identically. */
+.btn.btn-primary:disabled,
+.btn.btn-secondary:disabled,
+.btn.btn-danger:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+/* ---- Responsive ------------------------------------------------------ */
+
+@media (max-width: 1180px) {
+  .billing-plans-grid {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 1024px) {
+  .billing-page-header {
+    padding: var(--space-5);
+  }
+
+  .billing-top-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .billing-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-4) var(--space-5);
+  }
+
+  .billing-current-plan-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .billing-usage-row-head {
+    flex-wrap: wrap;
+  }
+
+  .billing-usage-row-count {
+    order: 3;
+    width: 100%;
+    margin-top: var(--space-1);
+  }
+
+  .billing-payment-row {
+    flex-wrap: wrap;
+  }
+
+  .billing-payment-actions {
+    width: 100%;
+  }
+
+  .billing-payment-actions .btn {
+    width: 100%;
+  }
+
+  .billing-history-table thead th,
+  .billing-history-table tbody td {
+    padding: var(--space-3) var(--space-4);
+  }
+}
+
+@media (max-width: 640px) {
+  .billing-page-title {
+    font-size: var(--font-xl);
+  }
+
+  .billing-card {
+    padding: var(--space-4);
+  }
+
+  .billing-card-header,
+  .billing-card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .billing-card-footer-actions {
+    width: 100%;
+  }
+
+  .billing-card-footer-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .billing-history-table-scroll {
+    display: none;
+  }
+
+  .billing-history-cards {
+    display: flex;
+  }
+
+  .billing-current-plan-price {
+    font-size: var(--font-2xl);
+  }
+
+  .billing-current-plan-name {
+    font-size: var(--font-xl);
+  }
+
+  .billing-plan {
+    padding: var(--space-4);
+  }
+}

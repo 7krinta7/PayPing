@@ -4,6 +4,11 @@ function unwrapInvoice(response) {
   return response?.invoice ?? response;
 }
 
+export async function getInvoices() {
+  const { data } = await api.get("/invoices");
+  return data;
+}
+
 export async function getPendingInvoices() {
   const { data } = await api.get('/invoices/pending');
   return data;
