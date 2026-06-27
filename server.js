@@ -1,6 +1,12 @@
 require("dotenv").config();
 const validateEnv = require("./config/validateEnv");
-validateEnv(["MONGO_URI", "JWT_SECRET", "EMAIL_USER", "EMAIL_PASS"]);
+validateEnv([
+  "MONGO_URI",
+  "JWT_SECRET",
+  "EMAIL_USER",
+  "EMAIL_PASS",
+  "CORS_ORIGINS"
+]);
 
 require("./models/Client");
 require("./models/ReminderRule");
