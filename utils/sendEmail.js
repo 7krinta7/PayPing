@@ -9,12 +9,16 @@ const sendEmail = async (to, subject, text) => {
     }
   });
 
-  await transporter.sendMail({
+    console.log("Sending email to:", to);
+
+  const info = await transporter.sendMail({
     from: `"PayPing" <${process.env.EMAIL_USER}>`,
     to,
     subject,
-    text
+    text,
   });
+
+  console.log("Email sent:", info.messageId);
 };
 
 module.exports = sendEmail;
