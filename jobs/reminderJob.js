@@ -7,7 +7,13 @@ const connectDB = require("../config/db");
 // The cron worker doesn't need the auth secret, but it does need
 // Mongo + email creds to deliver reminders. Fail fast if any are
 // missing — better than silently doing nothing on the schedule.
-validateEnv(["MONGO_URI", "EMAIL_USER", "EMAIL_PASS"]);
+validateEnv([
+  "MONGO_URI",
+  "JWT_SECRET",
+  "BREVO_API_KEY",
+  "BREVO_SENDER_EMAIL",
+  "BREVO_SENDER_NAME",
+]);
 
 const {
   runRuleBasedScheduler,
