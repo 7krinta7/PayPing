@@ -89,6 +89,43 @@ const CURRENCY_FORMATTER = new Intl.NumberFormat('en-IN', {
 
 const NUMBER_FORMATTER = new Intl.NumberFormat('en-US');
 
+const CHANNEL_LABELS = {
+  email: 'Email',
+  whatsapp: 'WhatsApp',
+};
+
+// Render a Date as a compact, human-friendly "5 minutes ago" / "Yesterday"
+// label. Caps at "X days ago" so older entries stay scannable.
+function formatRelative(value) {
+  if (!value) return '';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '';
+
+  const diffMs = Date.now() - d.getTime();
+  if (diffMs < 0) return 'just now';
+
+  const sec = Math.floor(diffMs / 1000);
+  if (sec < 45) return 'just now';
+  const min = Math.floor(sec / 60);
+  if (min < 60) return `${min} minute${min === 1 ? '' : 's'} ago`;
+
+  const hr = Math.floor(min / 60);
+  if (hr < 24) {
+    const sameDay = new Date().toDateString() === d.toDateString();
+    if (!sameDay && hr < 36) return 'Yesterday';
+    return `${hr} hour${hr === 1 ? '' : 's'} ago`;
+  }
+
+  const day = Math.floor(hr / 24);
+  if (day === 1) return 'Yesterday';
+  if (day < 7) return `${day} days ago`;
+  if (day < 30) {
+    const weeks = Math.floor(day / 7);
+    return `${weeks} week${weeks === 1 ? '' : 's'} ago`;
+  }
+  return d.toLocaleDateString();
+}
+
 function formatValue(value, format) {
   if (value === undefined || value === null || Number.isNaN(value)) return '—';
   if (format === 'currency') return CURRENCY_FORMATTER.format(value);
@@ -193,6 +230,12 @@ export default function DashboardPage() {
     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
     .slice(0, 5);
 
+  // Recent Activity rows come from the same /stats response as a populated
+  // array (max 5). Empty until the stats fetch resolves.
+  const recentActivity = Array.isArray(stats?.recentActivity)
+    ? stats.recentActivity
+    : [];
+
   return (
     <div className="dashboard-page dashboard-home">
       {/* 1. Welcome */}
@@ -242,17 +285,116 @@ export default function DashboardPage() {
         <section className="dashboard-card dashboard-activity-card" aria-labelledby="recent-activity-title">
           <header className="dashboard-card-header">
             <h2 id="recent-activity-title" className="dashboard-card-title">Recent Activity</h2>
-            <span className="dashboard-card-link-muted">Last events</span>
+            <span className="dashboard-card-link-muted">Last 5 reminders</span>
           </header>
-          <div className="dashboard-empty-state">
-            <span className="dashboard-empty-state-icon" aria-hidden="true">
-              {EMPTY_USERS}
-            </span>
-            <p className="dashboard-empty-state-title">No recent activity yet.</p>
-            <p className="dashboard-empty-state-body">
-              Client creation, invoices, payments and reminders will appear here.
-            </p>
-          </div>
+
+          {statsLoading ? (
+            <ul className="activity-list" aria-busy="true">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <li key={i} className="activity-row activity-row-skeleton">
+                  <span className="activity-skeleton activity-skeleton-dot" />
+                  <span className="activity-skeleton-stack">
+                    <span className="activity-skeleton activity-skeleton-headline" />
+                    <span className="activity-skeleton activity-skeleton-meta" />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : recentActivity.length === 0 ? (
+            <div className="dashboard-empty-state">
+              <span className="dashboard-empty-state-icon" aria-hidden="true">
+                {EMPTY_USERS}
+              </span>
+              <p className="dashboard-empty-state-title">No reminder activity yet.</p>
+              <p className="dashboard-empty-state-body">
+                Sent and failed reminders will appear here.
+              </p>
+            </div>
+          ) : (
+            <ul className="activity-list">
+              {recentActivity.map((row) => {
+                const status = (row.status || '').toLowerCase();
+                const channel = (row.channel || '').toLowerCase();
+                const channelLabel = CHANNEL_LABELS[channel] || (channel ? channel : null);
+                const invoice = row.invoice && typeof row.invoice === 'object' ? row.invoice : null;
+                const client = invoice && invoice.client && typeof invoice.client === 'object'
+                  ? invoice.client
+                  : null;
+                const clientName = (client && client.name) || '—';
+                const amountLabel = invoice && invoice.amount !== undefined && invoice.amount !== null
+                  ? CURRENCY_FORMATTER.format(invoice.amount)
+                  : null;
+                const timeLabel = formatRelative(row.sentAt) || null;
+                const invoiceId = invoice?._id || (typeof row.invoice === 'string' ? row.invoice : null);
+
+                // Headline: short event label so users understand what
+                // happened at a glance, before reading the metadata.
+                let headline;
+                let headlineClass;
+                let dotClass;
+                if (status === 'sent') {
+                  headline = 'Reminder sent';
+                  headlineClass = 'activity-headline activity-headline-sent';
+                  dotClass = 'activity-dot activity-dot-sent';
+                } else if (status === 'failed') {
+                  headline = 'Reminder failed';
+                  headlineClass = 'activity-headline activity-headline-failed';
+                  dotClass = 'activity-dot activity-dot-failed';
+                } else {
+                  headline = 'Reminder event';
+                  headlineClass = 'activity-headline activity-headline-unknown';
+                  dotClass = 'activity-dot activity-dot-unknown';
+                }
+
+                // Build the metadata line as [item, sep, item, sep, ...]
+                // skipping any null/empty entries so we never print a
+                // stranded separator.
+                const metaItems = [
+                  { key: 'client', node: <span className="activity-meta-item">{clientName}</span> },
+                  amountLabel
+                    ? { key: 'amount', node: <span className="activity-meta-item activity-meta-amount">{amountLabel}</span> }
+                    : null,
+                  channelLabel
+                    ? { key: 'channel', node: <span className="activity-meta-item">{channelLabel}</span> }
+                    : null,
+                  timeLabel
+                    ? { key: 'time', node: <span className="activity-meta-item">{timeLabel}</span> }
+                    : null
+                ].filter(Boolean);
+
+                return (
+                  <li key={row._id}>
+                    <button
+                      type="button"
+                      className="activity-row activity-row-button"
+                      onClick={() => invoiceId && navigate(`/invoices/${invoiceId}`)}
+                      disabled={!invoiceId}
+                      aria-label={
+                        invoiceId
+                          ? `Open invoice for ${clientName}, ${headline.toLowerCase()}${timeLabel ? `, ${timeLabel}` : ''}`
+                          : headline
+                      }
+                    >
+                      <span className={dotClass} aria-hidden="true" />
+                      <span className="activity-text">
+                        <span className={headlineClass}>{headline}</span>
+                        <span className="activity-meta">
+                          {metaItems.map((item, idx) => (
+                            <span key={item.key} className="activity-meta-item-wrap">
+                              {idx > 0 && (
+                                <span className="activity-meta-sep" aria-hidden="true">·</span>
+                              )}
+                              {item.node}
+                            </span>
+                          ))}
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </section>
 
         <section className="dashboard-card dashboard-quick-actions" aria-labelledby="quick-actions-title">

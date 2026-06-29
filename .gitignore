@@ -143,3 +143,6 @@ mongo-data/
 .npm/
 .yarn/
 .pnp.*
+# AI working files
+AI_CONTEXT.md
+PROJECT_STATUS.md

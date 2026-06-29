@@ -33,6 +33,11 @@ router.get("/", auth, async (req, res, next) => {
     const limit = Math.min(parseInt(req.query.limit, 10) || 200, 500);
 
     const history = await ReminderHistory.find(filter)
+      .populate({
+        path: "invoice",
+        select: "_id amount dueDate status client",
+        populate: { path: "client", select: "_id name email" }
+      })
       .sort({ sentAt: -1, createdAt: -1 })
       .limit(limit);
 

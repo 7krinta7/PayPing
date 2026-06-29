@@ -213,47 +213,195 @@
   padding: 0 var(--space-2) var(--space-2);
 }
 
+/* Two-line row: status headline on top, dense metadata on the bottom.
+   Tight vertical padding so the 2-line shape doesn't grow the card.
+   `align-items: start` pins the dot to the headline (the line the eye
+   reads first) instead of floating in the middle of the row. */
 .activity-row {
   display: grid;
-  grid-template-columns: 12px 1fr auto auto;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  grid-template-columns: 12px 1fr;
+  align-items: start;
+  column-gap: var(--space-3);
+  padding: var(--space-1) var(--space-4);
   border-radius: var(--radius-md);
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Static rows (skeleton) inherit only the grid. */
 .activity-row:hover {
   background-color: var(--color-surface-subtle);
 }
 
+/* Reset native <button> defaults so the clickable row matches the
+   static row visually. */
+.activity-row-button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.activity-row-button:disabled {
+  cursor: default;
+}
+
+/* Visible focus ring — matches the rest of the app (box-shadow halo on
+   --color-primary-bg) so keyboard users get the same signal as on
+   buttons, chips, and link-buttons elsewhere. */
+.activity-row-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.activity-row-button:hover:not(:disabled) {
+  background-color: var(--color-surface-subtle);
+}
+
+/* Status dot doubles as the row's color cue: same colors/tokens as the
+   existing .reminders-status-* badge family — no new tokens. */
 .activity-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
+  /* Nudge the dot down so it visually aligns with the headline
+     x-height instead of the row's top edge. */
+  margin-top: 5px;
 }
 
+.activity-dot-sent {
+  background-color: var(--color-success-text);
+}
+
+.activity-dot-failed {
+  background-color: var(--color-danger);
+}
+
+.activity-dot-unknown {
+  background-color: var(--color-text-muted);
+}
+
+/* Text column stacks two tight lines. */
 .activity-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Primary line: the event — "Reminder sent" / "Reminder failed".
+   Color comes from the existing --color-success-text / --color-danger
+   tokens so the eye picks up status before reaching the metadata. */
+.activity-headline {
   font-size: var(--font-sm);
+  font-weight: 600;
   color: var(--color-text-heading);
+  line-height: var(--leading-tight);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-headline-sent {
+  color: var(--color-success-text);
+}
+
+.activity-headline-failed {
+  color: var(--color-danger-text);
+}
+
+/* Secondary line: client · amount · channel · relative time. All
+   separators use the same · character so the line reads as one beat. */
+.activity-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0;
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  line-height: var(--leading-tight);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.activity-meta-item-wrap {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.activity-meta-item {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
 }
 
-.activity-amount {
-  font-size: var(--font-sm);
-  font-weight: 600;
-  color: var(--color-text);
-  white-space: nowrap;
+.activity-meta-sep {
+  color: var(--color-border-strong);
+  flex-shrink: 0;
+  user-select: none;
+  margin: 0 var(--space-2);
 }
 
-.activity-time {
-  font-size: var(--font-xs);
-  color: var(--color-text-muted);
-  white-space: nowrap;
+.activity-meta-amount {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* Skeleton rows match the final row footprint so layout doesn't shift. */
+.activity-row-skeleton {
+  cursor: default;
+  pointer-events: none;
+}
+
+.activity-row-skeleton:hover {
+  background-color: transparent;
+}
+
+/* Stack two skeleton lines in the text column to mirror the new
+   headline + meta two-line shape. */
+.activity-skeleton-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.activity-skeleton {
+  display: block;
+  height: 12px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-subtle) 0%,
+    var(--color-border) 50%,
+    var(--color-surface-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: reminders-skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.activity-skeleton-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 5px;
+}
+
+.activity-skeleton-headline {
+  width: 50%;
+  height: 14px;
+}
+
+.activity-skeleton-meta {
+  width: 75%;
+  height: 10px;
 }
 
 .dashboard-quick-actions {

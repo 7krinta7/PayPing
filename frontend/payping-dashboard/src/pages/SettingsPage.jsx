@@ -22,7 +22,7 @@ import './SettingsPage.css';
  * backend implementation details are exposed to the user.
  *
  * "Coming Soon" badges are reserved for genuine future product
- * features (WhatsApp reminders, Reminder Scheduling, Billing).
+ * features (WhatsApp reminders, Billing).
  * Anything that is simply a backend gap is surfaced via a single,
  * user-friendly line of helper text.
  *
@@ -441,17 +441,6 @@ export default function SettingsPage() {
 
         <div className="settings-card-body">
           <ul className="settings-feature-list" role="list">
-            <li className="settings-feature-row">
-              <div className="settings-feature-text">
-                <p className="settings-feature-name">Reminder Scheduling</p>
-                <p className="settings-feature-description">
-                  Build custom reminder schedules tied to invoice due dates and overdue states.
-                </p>
-              </div>
-              <span className="settings-coming-soon-badge" aria-label="Coming soon">
-                Coming Soon
-              </span>
-            </li>
             <li className="settings-feature-row">
               <div className="settings-feature-text">
                 <p className="settings-feature-name">WhatsApp Reminders</p>
