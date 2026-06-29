@@ -3,9 +3,7 @@ const validateEnv = require("./config/validateEnv");
 validateEnv([
   "MONGO_URI",
   "JWT_SECRET",
-  "EMAIL_USER",
-  "EMAIL_PASS",
-  "CORS_ORIGINS"
+  "BREVO_API_KEY",
 ]);
 
 require("./models/Client");

@@ -8,8 +8,8 @@ const sendEmail = async (to, subject, text) => {
   try {
     const result = await brevo.transactionalEmails.sendTransacEmail({
       sender: {
-        name: "PayPing",
-        email: "krishkrm07@gmail.com",
+            name: process.env.BREVO_SENDER_NAME,
+            email: process.env.BREVO_SENDER_EMAIL,
       },
       to: [{ email: to }],
       subject,
