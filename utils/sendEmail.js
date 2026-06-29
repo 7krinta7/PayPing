@@ -1,34 +1,24 @@
-const brevo = require("@getbrevo/brevo");
+const { BrevoClient } = require("@getbrevo/brevo");
 
-const apiInstance = new brevo.TransactionalEmailsApi();
-
-apiInstance.setApiKey(
-  brevo.TransactionalEmailsApiApiKeys.apiKey,
-  process.env.BREVO_API_KEY
-);
+const brevo = new BrevoClient({
+  apiKey: process.env.BREVO_API_KEY,
+});
 
 const sendEmail = async (to, subject, text) => {
   try {
-    const result = await apiInstance.sendTransacEmail({
+    const result = await brevo.transactionalEmails.sendTransacEmail({
       sender: {
         name: "PayPing",
         email: "krishkrm07@gmail.com",
       },
-      to: [
-        {
-          email: to,
-        },
-      ],
+      to: [{ email: to }],
       subject,
       textContent: text,
     });
 
-    console.log("Brevo email sent:", result.body);
+    console.log("Brevo email sent:", result.messageId || result);
   } catch (err) {
-    console.error(
-      "Brevo Error:",
-      err.response?.body || err.message || err
-    );
+    console.error("Brevo Error:", err);
     throw err;
   }
 };
