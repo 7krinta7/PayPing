@@ -4,6 +4,8 @@ validateEnv([
   "MONGO_URI",
   "JWT_SECRET",
   "BREVO_API_KEY",
+  "BREVO_SENDER_EMAIL",
+  "BREVO_SENDER_NAME",
 ]);
 
 require("./models/Client");
