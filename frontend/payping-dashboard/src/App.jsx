@@ -11,7 +11,7 @@ import RegisterPage from './pages/RegisterPage';
 import RemindersPage from './pages/RemindersPage';
 import ReminderRulesPage from './pages/ReminderRulesPage';
 import SettingsPage from './pages/SettingsPage';
-import BillingPage from './pages/BillingPage';
+// import BillingPage from './pages/BillingPage';
 import { useAuth } from './context/AuthContext';
 
 function RootRedirect() {
@@ -35,7 +35,7 @@ function App() {
           <Route path="/invoices/:id" element={<InvoiceDetailPage />} />
           <Route path="/reminders" element={<RemindersPage />} />
           <Route path="/reminders/rules" element={<ReminderRulesPage />} />
-          <Route path="/billing" element={<BillingPage />} />
+          {/* <Route path="/billing" element={<BillingPage />} /> */}
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Route>

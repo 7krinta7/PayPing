@@ -117,7 +117,7 @@ function DashboardLayout() {
                 <span className="nav-label">Settings</span>
               </NavLink>
             </li>
-            <li>
+            {/* <li>
               <NavLink
                 to="/billing"
                 className={({ isActive }) => (isActive ? 'active-link' : undefined)}
@@ -129,7 +129,7 @@ function DashboardLayout() {
                 </svg>
                 <span className="nav-label">Billing</span>
               </NavLink>
-            </li>
+            </li> */}
           </ul>
         </nav>
       </aside>
