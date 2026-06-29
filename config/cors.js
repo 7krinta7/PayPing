@@ -23,13 +23,27 @@ const allowlist = (() => {
 
 const isOriginAllowed = (origin) => {
   if (!origin) return true;
+
+  if (process.env.NODE_ENV !== "production") {
+    if (/^http:\/\/localhost:\d+$/.test(origin)) return true;
+    if (/^http:\/\/127\.0\.0\.1:\d+$/.test(origin)) return true;
+  }
+
   return allowlist.includes(origin);
 };
 
 const corsMiddleware = cors({
-  origin: (origin, cb) => cb(null, isOriginAllowed(origin)),
+  origin: (origin, cb) => {
+    if (isOriginAllowed(origin)) {
+      return cb(null, origin); // reflect the requesting origin
+    }
+
+    const err = new Error("Not allowed by CORS");
+err.status = 403;
+return cb(err);
+  },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 });
 

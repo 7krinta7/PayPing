@@ -108,6 +108,12 @@
   box-shadow: 1px 0 0 var(--color-divider-subtle);
   transition: width 0.3s ease;
   overflow-x: hidden;
+
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  align-self: start;
 }
 
 .dashboard-layout.sidebar-closed .sidebar {
