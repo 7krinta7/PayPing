@@ -2,19 +2,29 @@
  * Validation rules for /api/user/*.
  *
  * Mirrors the previous in-handler checks:
- *   - PATCH /me/profile: businessName optional, string, ≤120 chars (trimmed).
+ *   - PATCH /me/profile: name + businessName optional, strings, ≤120 chars
+ *     (trimmed). Email and password are explicitly rejected so callers can't
+ *     sneak those edits through this endpoint.
  *   - PATCH /me/password: currentPassword + newPassword strings, newPassword ≥ 8.
  *   - PATCH /me/notifications: email boolean (optional).
  */
 
 const { body } = require("express-validator");
 
+const NAME_MAX = 120;
 const BUSINESS_NAME_MAX = 120;
 const PASSWORD_MIN = 8;
 
 const profileRules = [
   body("email").not().exists().withMessage("email cannot be updated through this endpoint"),
   body("password").not().exists().withMessage("password cannot be updated through this endpoint"),
+  body("name")
+    .optional()
+    .isString().withMessage("name must be a string")
+    .bail()
+    .customSanitizer((v) => String(v).trim())
+    .isLength({ max: NAME_MAX })
+    .withMessage(`name is too long (max ${NAME_MAX})`),
   body("businessName")
     .optional()
     .isString().withMessage("businessName must be a string")

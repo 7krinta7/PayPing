@@ -156,6 +156,29 @@
 
 /* ---- Invoice link ----------------------------------------------------- */
 
+/* Stack the user-assigned invoice number above the View Invoice button
+   so the reference reads as primary, the navigation as secondary. */
+.reminder-recent-activity-invoice-stack {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.reminder-recent-activity-invoice-number {
+  display: inline-block;
+  max-width: 100%;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-heading);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .reminder-recent-activity-invoice-link {
   display: inline-flex;
   align-items: center;

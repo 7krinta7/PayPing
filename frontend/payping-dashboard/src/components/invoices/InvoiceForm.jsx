@@ -2,7 +2,13 @@ import { useMemo, useState } from 'react';
 import './InvoiceForm.css';
 import { getInitials, avatarColors } from '../../utils/avatar';
 
-const INITIAL_STATE = { client: '', amount: '', dueDate: '', description: '' };
+const INITIAL_STATE = {
+  client: '',
+  invoiceNumber: '',
+  amount: '',
+  dueDate: '',
+  description: ''
+};
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 const PLUS_ICON = (
@@ -108,7 +114,17 @@ export default function InvoiceForm({
   onCancel,
   onAddNewClient,
   submitting,
+  // True when the form is editing an already-paid invoice. Only the
+  // invoiceNumber and description remain editable in that case — the
+  // financial record (client / amount / dueDate / status) is locked so
+  // the paid transaction stays faithful. The parent supplies this from
+  // the loaded invoice's `status` field.
+  isPaid = false,
   mode = 'create', // 'create' | 'edit'
+  // Server-side error from the parent (e.g. 409 duplicate invoiceNumber).
+  // Displayed in the form-level error slot, taking priority over the
+  // local client-side validation error.
+  serverError = '',
 }) {
   const [form, setForm] = useState(() => {
     const merged = { ...INITIAL_STATE, ...(initialValues || {}) };
@@ -144,7 +160,48 @@ export default function InvoiceForm({
   };
 
   const validate = () => {
+    // Paid-invoice edits only carry the invoiceNumber + description
+    // through to the server (see `handleSubmit`), so the only fields
+    // worth validating on a paid edit are those two. All other fields
+    // are still required on create + on edit of a non-paid invoice.
+    if (mode === 'edit' && isPaid) {
+      const trimmedInvoiceNumber = (form.invoiceNumber || '').trim();
+      if (
+        trimmedInvoiceNumber !== (initialValues?.invoiceNumber || '').trim()
+      ) {
+        const hadOriginalNumber = Boolean(
+          (initialValues?.invoiceNumber || '').trim()
+        );
+        if (hadOriginalNumber && !trimmedInvoiceNumber) {
+          return 'Invoice number is required';
+        }
+      }
+      return '';
+    }
+
     if (!form.client) return 'Client is required';
+    // Invoice number is required on create (every new invoice must have
+    // a user-assigned identifier) and on edit when the draft differs
+    // from the value present on the loaded record. Legacy invoices
+    // (pre-this-field) often arrive with no invoiceNumber; the form
+    // must let the user save other changes without forcing them to
+    // add a number first, otherwise they can't update an overdue
+    // amount/due-date on a legacy row.
+    const trimmedInvoiceNumber = (form.invoiceNumber || '').trim();
+    if (mode !== 'edit' && !trimmedInvoiceNumber) {
+      return 'Invoice number is required';
+    }
+    if (mode === 'edit' && trimmedInvoiceNumber !== (initialValues?.invoiceNumber || '').trim()) {
+      // The user is touching the invoice number. If they cleared it,
+      // that is allowed (clearance is a valid edit). If they typed
+      // something new, it must be non-empty.
+      const hadOriginalNumber = Boolean(
+        (initialValues?.invoiceNumber || '').trim()
+      );
+      if (hadOriginalNumber && !trimmedInvoiceNumber) {
+        return 'Invoice number is required';
+      }
+    }
     const amount = Number(form.amount);
     if (!form.amount || isNaN(amount) || amount <= 0) {
       return 'Amount must be greater than 0';
@@ -164,12 +221,43 @@ export default function InvoiceForm({
       return;
     }
     setError('');
-    onSubmit({
+
+    // Build the patch payload. Invoice number handling is a little
+    // subtle: legacy invoices have no invoiceNumber on the server, and
+    // writing an empty string would push an empty value into the
+    // (sparse=false) unique index — which would later collide with any
+    // other legacy edit. Only send the field when the user has typed
+    // something, or when the original record already had one (so the
+    // user can clear or replace it).
+    const trimmedInvoiceNumber = (form.invoiceNumber || '').trim();
+    const originalInvoiceNumber = (initialValues?.invoiceNumber || '').trim();
+    const shouldSendInvoiceNumber =
+      trimmedInvoiceNumber.length > 0 || originalInvoiceNumber.length > 0;
+
+    // On a paid-invoice edit the locked fields (client / amount /
+    // dueDate / status) must not be sent — the server enforces this as
+    // well, but we already strip them here so the request body never
+    // even carries a forbidden field. Status is not in the payload
+    // shape anyway; it is owned by the mark-paid route.
+    if (mode === 'edit' && isPaid) {
+      const payload = { description: form.description.trim() };
+      if (shouldSendInvoiceNumber) {
+        payload.invoiceNumber = trimmedInvoiceNumber;
+      }
+      onSubmit(payload);
+      return;
+    }
+
+    const payload = {
       client: form.client,
       amount: Number(form.amount),
       dueDate: form.dueDate,
       description: form.description.trim(),
-    });
+    };
+    if (shouldSendInvoiceNumber) {
+      payload.invoiceNumber = trimmedInvoiceNumber;
+    }
+    onSubmit(payload);
   };
 
   const handleCancel = () => {
@@ -246,6 +334,11 @@ export default function InvoiceForm({
               <header className="invoice-form-section-header">
                 <h2 className="invoice-form-section-title">Client Details</h2>
                 <p className="invoice-form-section-helper">Choose the client you’re invoicing.</p>
+                {mode === 'edit' && isPaid && (
+                  <p className="invoice-form-section-locked-helper" role="note">
+                    Paid invoices can only update their invoice number and description.
+                  </p>
+                )}
               </header>
 
               <div className="invoice-form-searchable-client">
@@ -270,14 +363,19 @@ export default function InvoiceForm({
                         <span className="invoice-form-client-selected-email">{selectedClient.email}</span>
                       )}
                     </span>
-                    <button
-                      type="button"
-                      className="invoice-form-link"
-                      onClick={() => setForm((p) => ({ ...p, client: '' }))}
-                      disabled={submitting}
-                    >
-                      Change Client
-                    </button>
+                    {/* The Change Client action is hidden on paid edits
+                        because the client record is locked — surfacing
+                        it would be a UX dead end. */}
+                    {!(mode === 'edit' && isPaid) && (
+                      <button
+                        type="button"
+                        className="invoice-form-link"
+                        onClick={() => setForm((p) => ({ ...p, client: '' }))}
+                        disabled={submitting}
+                      >
+                        Change Client
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <>
@@ -292,7 +390,9 @@ export default function InvoiceForm({
                         onChange={(e) => setClientQuery(e.target.value)}
                         placeholder="Search clients by name or email…"
                         aria-label="Search clients"
-                        disabled={submitting}
+                        // Locked on a paid edit: the client field stays
+                        // populated but the picker can no longer be used.
+                        disabled={submitting || (mode === 'edit' && isPaid)}
                       />
                     </div>
 
@@ -310,7 +410,9 @@ export default function InvoiceForm({
                               aria-selected={form.client === c._id}
                               className={`invoice-form-client-row${form.client === c._id ? ' is-selected' : ''}`}
                               onClick={() => setForm((p) => ({ ...p, client: c._id }))}
-                              disabled={submitting}
+                              // Locked on a paid edit so a click cannot
+                              // re-assign the invoice to a different client.
+                              disabled={submitting || (mode === 'edit' && isPaid)}
                             >
                               <span
                                 className="invoice-form-client-avatar"
@@ -342,24 +444,26 @@ export default function InvoiceForm({
                   <span className="invoice-form-error">{clientError}</span>
                 )}
 
-                <div className="invoice-form-client-footer">
-                  <p className="invoice-form-client-footer-helper">
-                    Don&apos;t see the client?{' '}
-                    <a
-                      href="/clients"
-                      className="invoice-form-client-footer-link"
-                      onClick={(e) => {
-                        // Let the parent decide how to navigate (avoids a
-                        // full reload) so the SPA history is preserved.
-                        e.preventDefault();
-                        onAddNewClient?.();
-                      }}
-                    >
-                      Add them on the Clients page
-                    </a>{' '}
-                    first, then return here.
-                  </p>
-                </div>
+                {!(mode === 'edit' && isPaid) && (
+                  <div className="invoice-form-client-footer">
+                    <p className="invoice-form-client-footer-helper">
+                      Don&apos;t see the client?{' '}
+                      <a
+                        href="/clients"
+                        className="invoice-form-client-footer-link"
+                        onClick={(e) => {
+                          // Let the parent decide how to navigate (avoids a
+                          // full reload) so the SPA history is preserved.
+                          e.preventDefault();
+                          onAddNewClient?.();
+                        }}
+                      >
+                        Add them on the Clients page
+                      </a>{' '}
+                      first, then return here.
+                    </p>
+                  </div>
+                )}
               </div>
             </section>
 
@@ -369,6 +473,33 @@ export default function InvoiceForm({
                 <h2 className="invoice-form-section-title">Invoice Configuration</h2>
                 <p className="invoice-form-section-helper">Set amount, due date, status, and description.</p>
               </header>
+
+              <div className="invoice-form-field invoice-form-field-wide">
+                <label htmlFor="invoice-number">
+                  Invoice Number
+                  <span className="invoice-form-required" aria-hidden="true">*</span>
+                </label>
+                <input
+                  id="invoice-number"
+                  name="invoiceNumber"
+                  type="text"
+                  value={form.invoiceNumber}
+                  onChange={handleChange}
+                  disabled={submitting}
+                  placeholder="INV-2026-001"
+                  maxLength={50}
+                  autoComplete="off"
+                  className="invoice-form-input"
+                  aria-describedby="invoice-number-helper"
+                  aria-required="true"
+                />
+                <p
+                  id="invoice-number-helper"
+                  className="invoice-form-field-helper"
+                >
+                  Unique to your workspace. Shown on the invoice list, reminders, and emails.
+                </p>
+              </div>
 
               <div className="invoice-form-grid">
                 <div className="invoice-form-field">
@@ -385,7 +516,9 @@ export default function InvoiceForm({
                       step="0.01"
                       value={form.amount}
                       onChange={handleChange}
-                      disabled={submitting}
+                      // Locked on a paid edit: the paid amount must
+                      // not change after the transaction records it.
+                      disabled={submitting || (mode === 'edit' && isPaid)}
                       placeholder="0.00"
                       className="invoice-form-amount-input"
                     />
@@ -400,7 +533,9 @@ export default function InvoiceForm({
                     type="date"
                     value={form.dueDate}
                     onChange={handleChange}
-                    disabled={submitting}
+                    // Locked on a paid edit: the due date is part of
+                    // the historical record of the transaction.
+                    disabled={submitting || (mode === 'edit' && isPaid)}
                     className="invoice-form-input"
                   />
                 </div>
@@ -410,7 +545,10 @@ export default function InvoiceForm({
                   <StatusSelect
                     value={statusLocal}
                     onChange={setStatusLocal}
-                    disabled={submitting}
+                    // Locked on a paid edit: status transitions are
+                    // owned by the mark-paid / payment flow, never the
+                    // edit form.
+                    disabled={submitting || (mode === 'edit' && isPaid)}
                   />
                 </div>
               </div>
@@ -429,8 +567,8 @@ export default function InvoiceForm({
                 />
               </div>
 
-              {formError && (
-                <span className="invoice-form-error">{formError}</span>
+              {(serverError || formError) && (
+                <span className="invoice-form-error">{serverError || formError}</span>
               )}
             </section>
           </div>

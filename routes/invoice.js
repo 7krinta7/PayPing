@@ -15,7 +15,11 @@ router.post("/", auth, createRules, validate, async (req, res, next) => {
       client: req.body.client,
       amount: req.body.amount,
       dueDate: req.body.dueDate,
-      description: req.body.description
+      description: req.body.description,
+      // The validator already trimmed this and ensured it is a non-empty
+      // string. We still pass through the original so Mongoose can re-trim
+      // in case the schema's `trim` rule ever changes.
+      invoiceNumber: req.body.invoiceNumber
     });
 
     res.status(201).json(invoice);
@@ -63,8 +67,22 @@ router.patch("/:id", auth, updateRules, validate, async (req, res, next) => {
       throw new AppError(404, "Invoice not found");
     }
 
-    if (invoice.status === "paid") {
-      throw new AppError(400, "Cannot edit a paid invoice");
+    // Paid invoices are mostly immutable — the financial record (who,
+    // how much, when) is locked once marked paid. Only the user-facing
+    // reference (invoiceNumber) and the free-text description remain
+    // editable, e.g. so the user can append "Paid via UPI ref 1234" or
+    // correct a typo in the assigned invoice number. Any attempt to
+    // touch a locked field on a paid invoice is rejected with a clear
+    // field-level message rather than silently ignored, so the frontend
+    // can surface a useful error.
+    const isPaid = invoice.status === "paid";
+    const lockedFields = ["client", "amount", "dueDate", "status"];
+    const touchedLocked = lockedFields.find((f) => req.body[f] !== undefined);
+    if (isPaid && touchedLocked) {
+      throw new AppError(
+        400,
+        `Paid invoices can only update their invoice number and description (field "${touchedLocked}" is locked)`
+      );
     }
 
     if (req.body.amount !== undefined) {
@@ -77,6 +95,15 @@ router.patch("/:id", auth, updateRules, validate, async (req, res, next) => {
 
     if (req.body.description !== undefined) {
       invoice.description = req.body.description;
+    }
+
+    // invoiceNumber is optional on update — lets legacy invoices be
+    // back-filled manually. An explicit empty string clears the value
+    // (we set undefined so Mongoose omits it on save, keeping the
+    // legacy "no field" state instead of indexing an empty string).
+    if (req.body.invoiceNumber !== undefined) {
+      const next = String(req.body.invoiceNumber).trim();
+      invoice.invoiceNumber = next ? next : undefined;
     }
 
     await invoice.save();

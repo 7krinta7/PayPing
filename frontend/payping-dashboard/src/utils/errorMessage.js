@@ -62,3 +62,40 @@ export function formatApiError(err, fallback = 'Something went wrong') {
 
   return fallback;
 }
+
+/**
+ * formatLoginError — login-specific error mapping.
+ *
+ * The generic `formatApiError` maps 401 to "Your session has expired…"
+ * which is correct for protected routes but misleading on the login
+ * screen (the user is logging in, not holding a stale session). This
+ * helper produces login-appropriate copy and intentionally does NOT
+ * surface whether the email or the password was wrong — both share the
+ * same 401 from `/auth/login`.
+ *
+ *   - 401 (bad email or password)  → "Invalid email or password…"
+ *   - 429 (rate limited)           → "Too many login attempts…"
+ *   - Network / no response        → "Unable to reach the server…"
+ *   - anything else                → falls back to formatApiError,
+ *                                    which covers 5xx and any
+ *                                    server-supplied message.
+ */
+export function formatLoginError(err) {
+  if (isNetworkError(err)) {
+    return 'Unable to reach the server. Please check your internet connection and try again.';
+  }
+
+  const status = err?.response?.status;
+
+  if (status === 401) {
+    return 'Invalid email or password. Please try again.';
+  }
+  if (status === 429) {
+    return 'Too many login attempts. Please wait a few minutes and try again.';
+  }
+
+  // For everything else (5xx, validation 400, unexpected shapes) fall
+  // back to the generic mapper so the user still gets a sensible
+  // message and we don't have to duplicate copy.
+  return formatApiError(err, 'Invalid email or password. Please try again.');
+}

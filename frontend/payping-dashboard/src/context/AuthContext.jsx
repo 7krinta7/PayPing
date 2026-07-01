@@ -41,18 +41,39 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   // Rehydrate auth state from localStorage on first mount.
-  useEffect(() => {
+useEffect(() => {
+  const restoreSession = async () => {
     const stored = getToken();
     const payload = decodeToken(stored);
-    if (stored && payload) {
-      setTokenState(stored);
-      setUser(payload);
-    } else if (stored && !payload) {
-      // Stored but expired/invalid — clean it up.
-      clearToken();
+
+    if (!stored || !payload) {
+      if (stored) {
+        clearToken();
+      }
+      setLoading(false);
+      return;
     }
-    setLoading(false);
-  }, []);
+
+    try {
+      setTokenState(stored);
+
+      const { data } = await api.get("/user/me");
+
+      setUser({
+        ...payload,
+        ...data,
+      });
+    } catch (error) {
+      clearToken();
+      setTokenState(null);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  restoreSession();
+}, []);
 
   const handleAuthSuccess = useCallback((data) => {
     // Accept either { token } or { accessToken } from the backend.
@@ -66,7 +87,13 @@ export function AuthProvider({ children }) {
     }
     setToken(newToken);
     setTokenState(newToken);
-    setUser(payload);
+    // The backend now returns `{ token, user: { id, name, email } }`
+    // alongside the JWT. The JWT payload stays minimal (userId only)
+    // by design — we merge the response's display fields onto the
+    // token claims so the context exposes both. If `data.user` is
+    // absent (e.g. a legacy backend mid-rollout), the spread is a
+    // no-op and we fall back to the JWT payload alone.
+    setUser({ ...payload, ...(data?.user || {}) });
   }, []);
 
   const login = useCallback(
@@ -96,9 +123,18 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
+  // Merge additional fields (e.g. name from the profile update response)
+  // onto the existing context user. Used by Settings after a successful
+  // PATCH /api/user/profile so the Dashboard greeting reflects the new
+  // value without a full re-login / JWT round-trip.
+  const updateUser = useCallback((updates) => {
+    if (!updates || typeof updates !== 'object') return;
+    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
+  }, []);
+
   const value = useMemo(
-    () => ({ user, token, loading, login, register, logout }),
-    [user, token, loading, login, register, logout]
+    () => ({ user, token, loading, login, register, logout, updateUser }),
+    [user, token, loading, login, register, logout, updateUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

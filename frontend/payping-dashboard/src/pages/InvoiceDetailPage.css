@@ -187,6 +187,14 @@
   font-weight: 500;
 }
 
+/* Tabular numerals + slight weight bump so user-assigned invoice
+   numbers (which are usually alphanumeric references) read as
+   reference values rather than prose. */
+.invoice-detail-meta-value-mono {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
 /* ---- Description card ------------------------------------------------- */
 
 .invoice-detail-description {
@@ -298,6 +306,7 @@
 
 .invoice-detail-skeleton-cell-amount { width: 100px; height: 18px; }
 .invoice-detail-skeleton-cell-date   { width: 130px; }
+.invoice-detail-skeleton-cell-invoice { width: 110px; }
 
 @keyframes invoice-detail-shimmer {
   0%   { background-position: 200% 0; }

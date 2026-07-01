@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { formatApiError } from '../utils/errorMessage';
+import { formatLoginError } from '../utils/errorMessage';
 import loginIllustration from '../assets/login-illustration.png';
 import './LoginPage.css';
 
@@ -100,7 +100,7 @@ export default function LoginPage() {
       await login(email, password);
       navigate(redirectTo, { replace: true });
     } catch (err) {
-      setError(formatApiError(err, 'Invalid credentials'));
+      setError(formatLoginError(err));
     } finally {
       setSubmitting(false);
     }

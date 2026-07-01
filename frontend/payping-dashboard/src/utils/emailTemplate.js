@@ -14,6 +14,7 @@
 export const EMAIL_TEMPLATE_VARS = [
   'businessName',
   'clientName',
+  'invoiceNumber',
   'invoiceAmount',
   'dueDate',
   'invoiceDescription'
@@ -33,6 +34,7 @@ const PLACEHOLDER_RE = /\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/g;
 export const SAMPLE_VALUES = {
   businessName: 'Acme Studios',
   clientName: 'Priya Sharma',
+  invoiceNumber: 'INV-2026-0042',
   invoiceAmount: '12,500',
   dueDate: 'Tue Jul 01 2026',
   invoiceDescription: 'Website redesign — June 2026'

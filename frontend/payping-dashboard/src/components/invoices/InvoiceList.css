@@ -263,13 +263,64 @@
   background-color: var(--color-surface);
 }
 
+/* ---- Invoice # column ------------------------------------------------ */
+
+/* The user-assigned invoice number column. Sized to comfortably fit
+   "INV-2026-00145" without truncation on desktop. When the value is
+   missing for legacy invoices we render an em-dash so the column
+   stays a stable visual element. */
+.invoice-table-invoice-col {
+  width: 16%;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.invoice-table-invoice-cell {
+  width: 16%;
+  padding: 16px 8px 16px 16px;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.invoice-table-invoice-number {
+  display: inline-block;
+  max-width: 100%;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-heading);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  /* Single-line ellipsis so a long custom number never wraps and
+     disturbs the table layout. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.invoice-table-invoice-empty {
+  display: inline-block;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.invoice-skeleton-invoice {
+  display: inline-block;
+  width: 72%;
+  height: 14px;
+}
+
 /* ---- Name + avatar cell --------------------------------------------- */
 
-/* Client column gets the largest share — names, emails, and avatars
+/* Client column gets a generous share — names, emails, and avatars
    need room to breathe. Sized so the Amount column sits close to the
    visible client content rather than floating far to the right. */
 .invoice-table-name-col {
-  width: 35%;
+  width: 32%;
 }
 
 /* Client cells get tighter horizontal padding than the rest of the
@@ -748,6 +799,25 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+/* Mobile: invoice number rendered above the client name when present.
+   Kept visually subordinate (muted colour, tabular numerals) so the
+   client identity still reads as primary. */
+.invoice-card-invoice-number {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  /* Don't let a long custom number push the avatar / status out of
+     alignment — ellipsis keeps the card head stable. */
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .invoice-card-name-link {

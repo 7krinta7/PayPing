@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import PhoneNumberField from '../forms/PhoneNumberField';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 import './ClientForm.css';
 
 const INITIAL_STATE = { name: '', email: '', phone: '' };
@@ -13,10 +15,26 @@ export default function ClientForm({ initialValues, onSubmit, onCancel, submitti
     if (error) setError('');
   };
 
+  // Phone uses an E.164 string managed by PhoneNumberField, not a
+  // standard DOM event. Kept separate from `handleChange` so the
+  // parent state shape (form.phone as a string) stays the same.
+  const handlePhoneChange = (phone) => {
+    setForm((prev) => ({ ...prev, phone: phone || '' }));
+    if (error) setError('');
+  };
+
   const validate = () => {
     if (!form.name.trim()) return 'Name is required';
     if (form.email.trim() && !EMAIL_RE.test(form.email.trim())) {
       return 'Enter a valid email address';
+    }
+    // Phone is optional. If the user typed something, it must be a
+    // valid E.164 number — PhoneNumberField already shows a friendly
+    // inline error while the user is typing, but the submit-time
+    // guard catches the case where they tab past the field with an
+    // invalid value and click Save anyway.
+    if (form.phone && !isValidPhoneNumber(form.phone)) {
+      return 'Please enter a valid phone number';
     }
     return '';
   };
@@ -29,10 +47,13 @@ export default function ClientForm({ initialValues, onSubmit, onCancel, submitti
       return;
     }
     setError('');
+    // form.phone is already an E.164 string (or '' if blank), so
+    // trimming is a no-op on a number that starts with '+'. Forward
+    // it as-is so the backend stores exactly what the input shows.
     onSubmit({
       name: form.name.trim(),
       email: form.email.trim(),
-      phone: form.phone.trim(),
+      phone: form.phone ? form.phone.trim() : '',
     });
   };
 
@@ -72,13 +93,13 @@ export default function ClientForm({ initialValues, onSubmit, onCancel, submitti
 
       <div className="client-form-field">
         <label htmlFor="client-phone">Phone</label>
-        <input
+        <PhoneNumberField
           id="client-phone"
           name="phone"
-          type="tel"
           value={form.phone}
-          onChange={handleChange}
+          onChange={handlePhoneChange}
           disabled={submitting}
+          placeholder="Phone number"
         />
       </div>
 

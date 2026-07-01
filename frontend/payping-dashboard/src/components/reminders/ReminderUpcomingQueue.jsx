@@ -28,6 +28,17 @@ function resolveClientName(invoice) {
   return name || '—';
 }
 
+// Surface the user-assigned invoice number when present. Upcoming queue
+// rows are previewed against pending invoices, every one of which the
+// form requires to have a number — but legacy pending invoices
+// (pre-invoiceNumber) may still appear here, so we fall back to an
+// em-dash rather than fabricating a derived reference.
+function resolveInvoiceNumber(invoice) {
+  if (!invoice || typeof invoice === 'string') return null;
+  const raw = typeof invoice.invoiceNumber === 'string' ? invoice.invoiceNumber.trim() : '';
+  return raw || null;
+}
+
 function resolveRuleName(rule) {
   if (!rule) return '—';
   const name = typeof rule.name === 'string' ? rule.name.trim() : '';
@@ -146,13 +157,28 @@ export default function ReminderUpcomingQueue({
                   const clientName = resolveClientName(row.invoice);
                   const ruleName = resolveRuleName(row.rule);
                   const channel = (row.channel || '').toLowerCase();
+                  const invoiceNumber = resolveInvoiceNumber(row.invoice);
                   return (
                     <tr key={row._id}>
                       <td className="reminder-upcoming-queue-cell-client">{clientName}</td>
                       <td className="reminder-upcoming-queue-cell-invoice">
-                        {row.invoice && row.invoice._id
-                          ? `Invoice #${String(row.invoice._id).slice(-6)}`
-                          : '—'}
+                        {invoiceNumber ? (
+                          <span
+                            className="reminder-upcoming-queue-invoice-number"
+                            title={invoiceNumber}
+                          >
+                            {invoiceNumber}
+                          </span>
+                        ) : row.invoice && row.invoice._id ? (
+                          <span
+                            className="reminder-upcoming-queue-invoice-muted"
+                            title="Legacy invoice without an invoice number"
+                          >
+                            —
+                          </span>
+                        ) : (
+                          '—'
+                        )}
                       </td>
                       <td className="reminder-upcoming-queue-cell-rule">{ruleName}</td>
                       <td className="reminder-upcoming-queue-col-scheduled">

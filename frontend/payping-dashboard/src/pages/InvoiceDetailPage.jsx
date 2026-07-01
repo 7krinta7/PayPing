@@ -268,6 +268,18 @@ export default function InvoiceDetailPage() {
             )}
           </div>
           <div className="invoice-detail-meta-cell">
+            <span className="invoice-detail-meta-label">Invoice #</span>
+            {pageLoading || !invoice ? (
+              <span className="invoice-detail-skeleton-cell invoice-detail-skeleton-cell-invoice" />
+            ) : (
+              <span className="invoice-detail-meta-value invoice-detail-meta-value-mono">
+                {typeof invoice.invoiceNumber === 'string' && invoice.invoiceNumber.trim()
+                  ? invoice.invoiceNumber
+                  : <span className="invoice-detail-meta-value-muted">Not assigned</span>}
+              </span>
+            )}
+          </div>
+          <div className="invoice-detail-meta-cell">
             <span className="invoice-detail-meta-label">Client</span>
             {pageLoading || !invoice ? (
               <span className="invoice-detail-skeleton-cell" />

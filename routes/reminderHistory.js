@@ -35,7 +35,7 @@ router.get("/", auth, async (req, res, next) => {
     const history = await ReminderHistory.find(filter)
       .populate({
         path: "invoice",
-        select: "_id amount dueDate status client",
+        select: "_id amount dueDate status client invoiceNumber",
         populate: { path: "client", select: "_id name email" }
       })
       .sort({ sentAt: -1, createdAt: -1 })
@@ -133,7 +133,7 @@ router.get("/upcoming", auth, async (req, res, next) => {
         .lean(),
       Invoice.find({ user: userId, status: "pending" })
         .populate("client", "name email")
-        .select("_id amount dueDate client")
+        .select("_id amount dueDate client invoiceNumber")
         .lean()
     ]);
 
@@ -203,6 +203,7 @@ router.get("/upcoming", auth, async (req, res, next) => {
         _id: t.invoice._id,
         amount: t.invoice.amount,
         dueDate: t.invoice.dueDate,
+        invoiceNumber: t.invoice.invoiceNumber || null,
         client: t.invoice.client
           ? { _id: t.invoice.client._id, name: t.invoice.client.name || null }
           : null

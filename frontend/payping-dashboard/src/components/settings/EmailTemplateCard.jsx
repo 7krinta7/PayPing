@@ -367,6 +367,7 @@ export default function EmailTemplateCard() {
 const VARIABLE_HINTS = {
   businessName: 'Your business name',
   clientName: 'The recipient client name',
+  invoiceNumber: 'User-assigned invoice number',
   invoiceAmount: 'Invoice amount',
   dueDate: 'Invoice due date',
   invoiceDescription: 'Invoice description'

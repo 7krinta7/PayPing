@@ -48,6 +48,26 @@ function resolveClientName(invoice) {
   return name || '—';
 }
 
+// Resolve the user-assigned invoice number for a populated invoice
+// object. Legacy invoices pre-dating the field surface as null so the
+// caller can render the muted em-dash state.
+function resolveInvoiceNumber(invoice) {
+  if (!invoice || typeof invoice === 'string') return null;
+  const raw = typeof invoice.invoiceNumber === 'string' ? invoice.invoiceNumber.trim() : '';
+  return raw || null;
+}
+
+// Resolve the user-assigned invoice number, falling back to a
+// short-form ObjectId tail for legacy invoices (pre-invoiceNumber).
+// Used only in the aria-label so screen readers always hear *some*
+// reference for the row, never a bare "View invoice".
+function resolveInvoiceReference(invoice) {
+  const number = resolveInvoiceNumber(invoice);
+  if (number) return number;
+  const id = invoice && typeof invoice === 'object' ? invoice._id : invoice;
+  return id ? `invoice ${String(id).slice(-6)}` : 'invoice';
+}
+
 /**
  * ReminderRecentActivity — presentational list of the most recent
  * ReminderHistory rows for the dashboard.
@@ -177,6 +197,8 @@ export default function ReminderRecentActivity({
                   const isFailed = status === 'failed';
                   const invoiceId =
                     row.invoice && typeof row.invoice === 'object' ? row.invoice._id : row.invoice;
+                  const invoiceNumber = resolveInvoiceNumber(row.invoice);
+                  const invoiceReference = resolveInvoiceReference(row.invoice);
                   return (
                     <tr key={row._id} className={isFailed ? 'is-failed' : undefined}>
                       <td className="reminder-recent-activity-col-status">
@@ -188,13 +210,28 @@ export default function ReminderRecentActivity({
                       <td className="reminder-recent-activity-cell-client">{clientName}</td>
                       <td className="reminder-recent-activity-cell-invoice">
                         {invoiceId ? (
-                          <button
-                            type="button"
-                            className="reminder-recent-activity-invoice-link"
-                            onClick={() => goToInvoice(row.invoice)}
-                          >
-                            View invoice
-                          </button>
+                          <div className="reminder-recent-activity-invoice-stack">
+                            {invoiceNumber ? (
+                              <span
+                                className="reminder-recent-activity-invoice-number"
+                                title={invoiceNumber}
+                              >
+                                {invoiceNumber}
+                              </span>
+                            ) : (
+                              <span className="reminder-recent-activity-cell-text-muted" aria-label="No invoice number assigned">
+                                —
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              className="reminder-recent-activity-invoice-link"
+                              onClick={() => goToInvoice(row.invoice)}
+                              aria-label={`View ${invoiceReference}`}
+                            >
+                              View invoice
+                            </button>
+                          </div>
                         ) : (
                           <span className="reminder-recent-activity-cell-text-muted">—</span>
                         )}

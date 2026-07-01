@@ -32,11 +32,14 @@ import './SettingsPage.css';
  */
 
 export default function SettingsPage() {
-  const { logout } = useAuth();
+  const { logout, updateUser } = useAuth();
   const navigate = useNavigate();
 
   // ---- Profile state -------------------------------------------------
-  const [profile, setProfile] = useState({ email: '', businessName: '' });
+  // Mirrors the response shape of GET /api/user/me so we can prefill both
+  // Full Name and Business Name without making a second request.
+  const [profile, setProfile] = useState({ email: '', name: '', businessName: '' });
+  const [nameDraft, setNameDraft] = useState('');
   const [businessNameDraft, setBusinessNameDraft] = useState('');
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState('');
@@ -64,8 +67,10 @@ export default function SettingsPage() {
         if (cancelled) return;
         setProfile({
           email: data?.email || '',
+          name: data?.name || '',
           businessName: data?.businessName || ''
         });
+        setNameDraft(data?.name || '');
         setBusinessNameDraft(data?.businessName || '');
         setEmailRemindersEnabled(Boolean(data?.notificationPreferences?.email));
       } catch (err) {
@@ -82,8 +87,11 @@ export default function SettingsPage() {
     return () => { cancelled = true; };
   }, []);
 
-  // Save is only allowed when the draft differs from the loaded value.
-  const isDirty = businessNameDraft !== (profile.businessName || '');
+  // Save is only allowed when at least one draft differs from the loaded
+  // value. A user may edit either Full Name, Business Name, or both.
+  const isDirty =
+    nameDraft !== (profile.name || '') ||
+    businessNameDraft !== (profile.businessName || '');
   const canSave = !profileLoading && !saving && isDirty;
 
   const handleSaveProfile = async (e) => {
@@ -93,10 +101,21 @@ export default function SettingsPage() {
       setSaving(true);
       setProfileError('');
       setSaveMessage('');
-      const data = await updateProfile({ businessName: businessNameDraft });
-      const nextName = data?.businessName ?? businessNameDraft.trim();
-      setProfile((prev) => ({ ...prev, businessName: nextName }));
-      setBusinessNameDraft(nextName);
+      // The backend trims and stores whatever we send. Empty strings are
+      // valid (a user may clear their Business Name); we forward exactly
+      // what the input contains so an accidental clear is explicit.
+      const data = await updateProfile({
+        name: nameDraft,
+        businessName: businessNameDraft
+      });
+      const nextName = data?.name ?? nameDraft.trim();
+      const nextBusinessName = data?.businessName ?? businessNameDraft.trim();
+      setProfile((prev) => ({ ...prev, name: nextName, businessName: nextBusinessName }));
+      setNameDraft(nextName);
+      setBusinessNameDraft(nextBusinessName);
+      // Keep AuthContext in sync so the Dashboard greeting reflects the
+      // new value immediately, without a re-login / JWT round-trip.
+      updateUser({ name: nextName });
       setSaveMessage('Profile updated.');
     } catch (err) {
       setProfileError(formatApiError(err, 'Failed to update profile'));
@@ -183,6 +202,38 @@ export default function SettingsPage() {
             )}
             <p id="settings-email-helper" className="settings-row-helper settings-row-helper-muted">
               Email cannot be changed here.
+            </p>
+          </div>
+
+          <div className="settings-row-stacked">
+            <label htmlFor="settings-full-name" className="settings-row-label-text">
+              Full Name
+            </label>
+            {profileLoading ? (
+              <span
+                className="settings-skeleton settings-skeleton-input"
+                role="status"
+                aria-label="Loading full name"
+              />
+            ) : (
+              <input
+                id="settings-full-name"
+                type="text"
+                className="settings-text-input"
+                placeholder="Not set"
+                value={nameDraft}
+                onChange={(e) => {
+                  setNameDraft(e.target.value);
+                  setSaveMessage('');
+                }}
+                disabled={saving}
+                maxLength={120}
+                autoComplete="name"
+                aria-describedby="settings-full-name-helper"
+              />
+            )}
+            <p id="settings-full-name-helper" className="settings-row-helper settings-row-helper-muted">
+              Used to greet you on the dashboard. Leave blank to remove.
             </p>
           </div>
 

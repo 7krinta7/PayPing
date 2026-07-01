@@ -40,10 +40,18 @@ function formatDueDate(invoice) {
 function buildValues({ user, invoice }) {
   const clientName = invoice?.client?.name || "";
   const description = (invoice?.description || "").trim();
+  // The user-assigned invoice number is the natural reference in
+  // reminder emails. Legacy invoices may not have one, so we render
+  // an empty string rather than "undefined" or the raw ObjectId — the
+  // default template only references {{invoiceNumber}} in prose, and
+  // a missing number should read as "no reference" rather than
+  // expose internal identifiers.
+  const invoiceNumber = (invoice?.invoiceNumber || "").trim();
 
   return {
     businessName: user?.businessName || "",
     clientName,
+    invoiceNumber,
     invoiceAmount: invoice?.amount != null ? String(invoice.amount) : "",
     dueDate: formatDueDate(invoice),
     invoiceDescription: description

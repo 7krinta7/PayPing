@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { getDashboardStats } from '../services/dashboardService';
 import { getPendingInvoices } from '../services/invoiceService';
 import { formatApiError } from '../utils/errorMessage';
@@ -132,6 +133,28 @@ function formatValue(value, format) {
   return NUMBER_FORMATTER.format(value);
 }
 
+// Derive a greeting-ready first name from the authenticated user's
+// `name`. Trims, splits on any whitespace, returns the first token.
+// Empty string when the name is unavailable so callers can fall back
+// to the generic greeting.
+function firstNameOf(name) {
+  if (typeof name !== 'string') return '';
+  const trimmed = name.trim();
+  if (!trimmed) return '';
+  return trimmed.split(/\s+/)[0] || '';
+}
+
+// Time-of-day greeting based on the *client's* local clock.
+// Boundaries: <12 morning, 12–16 afternoon, 17+ evening.
+// Local time is fine here — the greeting is presentational, not
+// transactional, so a small skew across time zones is acceptable.
+function greetingFor(date) {
+  const hour = date.getHours();
+  if (hour < 12) return 'Good Morning';
+  if (hour < 17) return 'Good Afternoon';
+  return 'Good Evening';
+}
+
 // Build a contextual helper line for each stat from the actual data.
 function statHelper(key, value, loading) {
   if (loading) return 'Loading…';
@@ -176,6 +199,13 @@ function formatDueDate(iso) {
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const firstName = firstNameOf(user?.name);
+  // Recomputed on every render so the greeting flips between
+  // morning/afternoon/evening without a manual refresh.
+  const heading = firstName
+    ? `${greetingFor(new Date())}, ${firstName}`
+    : 'Welcome back';
 
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(true);
@@ -242,7 +272,7 @@ export default function DashboardPage() {
       <section className="dashboard-home-header">
         <div>
           <p className="dashboard-home-eyebrow">Today</p>
-          <h1 className="dashboard-home-title">Welcome back!</h1>
+          <h1 className="dashboard-home-title">{heading}</h1>
           <p className="dashboard-home-subtitle">
             Here&apos;s what&apos;s happening with your invoices today.
           </p>

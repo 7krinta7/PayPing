@@ -2,14 +2,12 @@ import './InvoiceList.css';
 import { Link } from 'react-router-dom';
 import { getInitials, avatarColors } from '../../utils/avatar';
 
-// TODO(re-invoice-column): The "Invoice" reference column was removed
-// from the table because we currently do NOT have a real sequential
-// `invoiceNumber` field on the Invoice model — references would be
-// fabricated from Mongo ObjectIds, which is misleading in a finance UI.
-//
-// Reintroduce the column once a real `invoiceNumber` field is stored on
-// the backend Invoice schema and returned by the API. Until then, do NOT
-// re-import `formatInvoiceRef` for table display.
+// The Invoice column was previously removed pending a real
+// `invoiceNumber` field on the backend. The schema now exposes one
+// (user-assigned, unique per workspace), so we render it as the
+// leftmost column. Legacy invoices that pre-date the field simply
+// render with an em-dash and remain fully editable — the user can
+// back-fill a number by clicking Edit.
 
 const EMPTY_ICON = (
   <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -151,6 +149,7 @@ export default function InvoiceList({
         <table className="invoice-table">
           <thead>
             <tr>
+              <th className="invoice-table-invoice-col">Invoice</th>
               <th>Client</th>
               <th className="invoice-table-amount-col">Amount</th>
               <th className="invoice-table-due-col">Due Date</th>
@@ -161,6 +160,9 @@ export default function InvoiceList({
           <tbody>
             {[0, 1, 2, 3].map((i) => (
               <tr key={i} className="invoice-skeleton-row">
+                <td className="invoice-table-invoice-cell">
+                  <span className="invoice-skeleton invoice-skeleton-invoice" />
+                </td>
                 <td>
                   <div className="invoice-skeleton-cell">
                     <span className="invoice-skeleton-avatar" />
@@ -211,6 +213,7 @@ export default function InvoiceList({
         <table className="invoice-table">
           <thead>
             <tr>
+              <th className="invoice-table-invoice-col">Invoice</th>
               <th className="invoice-table-name-col">Client</th>
               <th className="invoice-table-amount-col">Amount</th>
               <th className="invoice-table-due-col">Due Date</th>
@@ -235,6 +238,12 @@ export default function InvoiceList({
               const overdue = isOverdue(invoice.dueDate, invoice.status);
               const dueLabel = formatDate(invoice.dueDate);
               const amountLabel = formatINR(invoice.amount);
+              // Surface the user-assigned invoice number verbatim. Empty
+              // string → em-dash so the cell stays a stable visual column
+              // and the row is recognisable as "no number yet".
+              const invoiceNumberLabel = (typeof invoice.invoiceNumber === 'string' && invoice.invoiceNumber.trim())
+                ? invoice.invoiceNumber
+                : null;
 
               return (
                 <tr
@@ -243,6 +252,20 @@ export default function InvoiceList({
                   className={`invoice-table-row${client.missing ? ' is-orphan' : ''}`}
                   style={{ animationDelay: `${Math.min(index * 24, 240)}ms` }}
                 >
+                  <td className="invoice-table-invoice-cell">
+                    {invoiceNumberLabel ? (
+                      <span className="invoice-table-invoice-number" title={invoiceNumberLabel}>
+                        {invoiceNumberLabel}
+                      </span>
+                    ) : (
+                      <span
+                        className="invoice-table-invoice-empty"
+                        title="Add an invoice number by editing this invoice"
+                      >
+                        —
+                      </span>
+                    )}
+                  </td>
                   <td className="invoice-table-name-cell">
                     <div className="invoice-table-name-content">
                     <span
@@ -357,6 +380,9 @@ export default function InvoiceList({
           const overdue = isOverdue(invoice.dueDate, invoice.status);
           const dueLabel = formatDate(invoice.dueDate);
           const amountLabel = formatINR(invoice.amount);
+          const invoiceNumberLabel = (typeof invoice.invoiceNumber === 'string' && invoice.invoiceNumber.trim())
+            ? invoice.invoiceNumber
+            : null;
 
           return (
             <li
@@ -373,6 +399,11 @@ export default function InvoiceList({
                   {initials}
                 </span>
                 <div className="invoice-card-head-text">
+                  {invoiceNumberLabel && (
+                    <span className="invoice-card-invoice-number" title={invoiceNumberLabel}>
+                      {invoiceNumberLabel}
+                    </span>
+                  )}
                   <Link
                     to={`/invoices/${invoice._id}`}
                     className="invoice-card-name-link"

@@ -136,6 +136,32 @@
   min-width: 140px;
 }
 
+/* ---- Invoice cell ----------------------------------------------------- */
+
+/* User-assigned invoice number — same treatment as the InvoiceList
+   table cell so the dashboard surfaces agree on visual weight. */
+.reminder-upcoming-queue-invoice-number {
+  display: inline-block;
+  max-width: 100%;
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--color-text-heading);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Legacy pending invoices (pre-invoiceNumber) keep a muted em-dash so
+   the column stays a stable visual element. */
+.reminder-upcoming-queue-invoice-muted {
+  display: inline-block;
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
 /* ---- Channel chip ----------------------------------------------------- */
 
 .reminder-upcoming-queue-channel {

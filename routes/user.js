@@ -26,6 +26,7 @@ router.get("/me", auth, async (req, res, next) => {
 
     res.json({
       email: user.email,
+      name: user.name || "",
       businessName: user.businessName || "",
       entitlements: user.entitlements,
       notificationPreferences: user.notificationPreferences
@@ -37,8 +38,8 @@ router.get("/me", auth, async (req, res, next) => {
 
 /**
  * PATCH /api/user/profile
- * Update only the fields the user is allowed to change (businessName).
- * Email and password are deliberately rejected here.
+ * Update only the fields the user is allowed to change (name, businessName).
+ * Email and password are deliberately rejected here (enforced by profileRules).
  */
 router.patch("/profile", auth, profileRules, validate, async (req, res, next) => {
   try {
@@ -46,6 +47,12 @@ router.patch("/profile", auth, profileRules, validate, async (req, res, next) =>
 
     if (!user) {
       throw new AppError(404, "User not found");
+    }
+
+    // `name` — display name used by the Dashboard greeting. Optional so
+    // existing users without a name keep working; an explicit `""` clears it.
+    if (req.body.name !== undefined) {
+      user.name = String(req.body.name).trim();
     }
 
     if (req.body.businessName !== undefined) {
@@ -57,6 +64,7 @@ router.patch("/profile", auth, profileRules, validate, async (req, res, next) =>
     res.json({
       message: "Profile updated",
       email: user.email,
+      name: user.name || "",
       businessName: user.businessName || ""
     });
   } catch (error) {

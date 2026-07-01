@@ -12,7 +12,7 @@ const DEFAULT_EMAIL_SUBJECT = "Payment Reminder";
 
 const DEFAULT_EMAIL_BODY = `Hi {{clientName}},
 
-This is a friendly reminder that {{businessName}} has an invoice of ₹{{invoiceAmount}} pending.
+This is a friendly reminder that {{businessName}} has invoice {{invoiceNumber}} (₹{{invoiceAmount}}) pending.
 
 {{invoiceDescription}}
 
@@ -27,6 +27,7 @@ Please let us know if you have any questions.
 const EMAIL_TEMPLATE_VARS = [
   "businessName",
   "clientName",
+  "invoiceNumber",
   "invoiceAmount",
   "dueDate",
   "invoiceDescription"
@@ -46,6 +47,15 @@ const UserSchema = new mongoose.Schema({
   businessName: {
     type: String,
     trim: true
+  },
+  // 🧑 User's display name collected at registration. Optional on the
+  // schema (existing rows predate this field) so existing users keep
+  // working without a migration. The register handler enforces
+  // presence + format for new sign-ups.
+  name: {
+    type: String,
+    trim: true,
+    maxlength: 120
   },
     // 🔐 Paid feature entitlements
   entitlements: {

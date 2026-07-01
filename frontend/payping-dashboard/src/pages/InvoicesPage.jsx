@@ -11,13 +11,9 @@ import InvoiceList from '../components/invoices/InvoiceList';
 import InvoiceForm from '../components/invoices/InvoiceForm';
 import ConfirmDialog from '../components/clients/ConfirmDialog';
 import { formatApiError } from '../utils/errorMessage';
-// NOTE: `formatInvoiceRef` was previously imported here to fabricate
-// INV-XXXXXX-style references by hashing the Mongo ObjectId. That
-// behaviour was misleading in a finance UI and is no longer used for
-// search or confirm dialog text. The Invoice column in the table has
-// been removed until the backend exposes a real sequential
-// `invoiceNumber` field — see TODO(re-invoice-column) in
-// utils/invoiceDisplay.js.
+// The invoice table now displays the user-assigned `invoiceNumber` field
+// returned by the API. Legacy invoices that pre-date the field render with
+// an empty cell so the user can edit and add one.
 import './InvoicesPage.css';
 
 const INR_FORMATTER = new Intl.NumberFormat('en-IN', {
@@ -255,7 +251,8 @@ export default function InvoicesPage() {
       return (
         name.includes(q) ||
         email.includes(q) ||
-        amount.includes(q)
+        amount.includes(q) ||
+        (typeof inv.invoiceNumber === 'string' && inv.invoiceNumber.toLowerCase().includes(q))
       );
     });
   }, [invoices, query, statusFilter]);
@@ -296,31 +293,36 @@ export default function InvoicesPage() {
       {showForm && (
         <InvoiceForm
           key="create"
-          initialValues={{ client: '', amount: '', dueDate: '', description: '' }}
+          initialValues={{ client: '', invoiceNumber: '', amount: '', dueDate: '', description: '' }}
           clients={clients}
           onSubmit={handleCreate}
           onCancel={handleCancelForm}
           submitting={submitting}
+          serverError={error}
         />
       )}
 
       {editingInvoice && (
-        <InvoiceForm
-          key={`edit-${editingInvoice._id}`}
-          initialValues={{
-            client:
-              typeof editingInvoice.client === 'object'
-                ? editingInvoice.client._id
-                : editingInvoice.client || '',
-            amount: editingInvoice.amount ?? '',
-            dueDate: editingInvoice.dueDate ? editingInvoice.dueDate.slice(0, 10) : '',
-            description: editingInvoice.description || '',
-          }}
-          clients={clients}
-          onSubmit={handleUpdate}
-          onCancel={handleCancelForm}
-          submitting={submitting}
-        />
+  <InvoiceForm
+    key={`edit-${editingInvoice._id}`}
+    initialValues={{
+      client:
+        typeof editingInvoice.client === 'object'
+          ? editingInvoice.client._id
+          : editingInvoice.client || '',
+      invoiceNumber: editingInvoice.invoiceNumber || '',
+      amount: editingInvoice.amount ?? '',
+      dueDate: editingInvoice.dueDate ? editingInvoice.dueDate.slice(0, 10) : '',
+      description: editingInvoice.description || '',
+    }}
+    mode="edit"
+    isPaid={editingInvoice.status === 'paid'}
+    clients={clients}
+    onSubmit={handleUpdate}
+    onCancel={handleCancelForm}
+    submitting={submitting}
+    serverError={error}
+  />
       )}
 
       {/* Stats cards — top-level overview */}
@@ -390,7 +392,7 @@ export default function InvoicesPage() {
           <input
             type="search"
             className="invoices-toolbar-search-input"
-            placeholder="Search by client or amount"
+            placeholder="Search by client, invoice number, or amount"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             aria-label="Search invoices"

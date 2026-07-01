@@ -21,6 +21,7 @@ const { DEFAULT_EMAIL_SUBJECT, DEFAULT_EMAIL_BODY, EMAIL_TEMPLATE_VARS } = requi
 const TEST_EMAIL_SAMPLE = {
   businessName: "Acme Studios",
   clientName: "Priya Sharma",
+  invoiceNumber: "INV-2026-0042",
   invoiceAmount: "12,500",
   dueDate: new Date().toDateString(),
   invoiceDescription: "Website redesign — sample invoice"
@@ -161,6 +162,7 @@ router.post("/test", auth, async (req, res, next) => {
     const fakeInvoice = {
       amount: TEST_EMAIL_SAMPLE.invoiceAmount,
       description: TEST_EMAIL_SAMPLE.invoiceDescription,
+      invoiceNumber: TEST_EMAIL_SAMPLE.invoiceNumber,
       client: { name: TEST_EMAIL_SAMPLE.clientName }
     };
 

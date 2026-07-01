@@ -41,7 +41,26 @@ function errorHandler(err, req, res, next) {
     message = `${err.path || "value"} must be a valid id`;
   } else if (err && err.code === 11000) {
     status = 409;
-    message = "Resource already exists";
+    // Try to name the field that collided so the client can surface a
+    // useful error (e.g. "Invoice number already exists"). The keyValue
+    // shape varies across Mongoose versions, so we read defensively.
+    let friendlyField = null;
+    if (err.keyValue && typeof err.keyValue === "object") {
+      const keys = Object.keys(err.keyValue);
+      if (keys.length) {
+        const k = keys.find((x) => x !== "_id") || keys[0];
+        friendlyField = k;
+      }
+    }
+    if (friendlyField === "invoiceNumber") {
+      message = "Invoice number already exists";
+    } else if (friendlyField) {
+      // Capitalise the first character for a generic but field-aware
+      // message — e.g. "Email already exists".
+      message = `${friendlyField.charAt(0).toUpperCase()}${friendlyField.slice(1)} already exists`;
+    } else {
+      message = "Resource already exists";
+    }
   } else if (err && err.type === "entity.too.large") {
     status = 413;
     message = "Request body too large";

@@ -1,0 +1,221 @@
+/* =========================================================================
+   PhoneNumberField — wraps `react-phone-number-input` so the field
+   reads as native to the PayPing design system.
+
+   The library's own CSS is imported in PhoneNumberField.jsx. This file
+   overrides the library classes (`.PhoneInput`, `.PhoneInputInput`,
+   `.PhoneInputCountrySelect`, etc.) so the field shares the same
+   surface, border, focus-ring, and disabled treatment as the rest of
+   the form inputs (see `App.css` `.form-field input` /
+   `.client-form-field input`).
+
+   No new design tokens. Every value references a `--*` variable from
+   `index.css`.
+   ========================================================================= */
+
+.phone-number-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+/* ---- Container (the flex row that holds flag + select + input) ------- */
+
+.phone-number-field .PhoneInput {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  /* Reset the library's own border so we can re-apply a single
+     unified border on the whole row — same treatment as the
+     standard form input. */
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.phone-number-field .PhoneInput:hover {
+  border-color: var(--color-border-focus);
+}
+
+.phone-number-field .PhoneInput:focus-within {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
+}
+
+.phone-number-field.has-error .PhoneInput {
+  border-color: var(--color-danger);
+}
+
+.phone-number-field.has-error .PhoneInput:focus-within {
+  box-shadow: 0 0 0 3px var(--color-danger-bg);
+}
+
+/* ---- Country selector (the <select> on the left) --------------------- */
+
+.phone-number-field .PhoneInputCountry {
+  /* Library default: `position: relative; align-self: stretch;` is
+     required so the absolutely-positioned <select> below is anchored
+     to the country block (not the viewport). Do not remove. */
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  /* Spacing between the flag block and the input — matches the
+     library's default rhythm but is explicit so the design stays
+     consistent if the library default ever shifts. */
+  padding: 0 var(--space-2) 0 var(--space-3);
+  border-right: 1px solid var(--color-border);
+  background-color: transparent;
+  border-top-left-radius: calc(var(--radius-sm) - 1px);
+  border-bottom-left-radius: calc(var(--radius-sm) - 1px);
+  flex-shrink: 0;
+  gap: var(--space-2);
+}
+
+.phone-number-field .PhoneInputCountrySelect {
+  /* The <select> itself — invisible but functional. The visible
+     affordance is the flag + the chevron. The library positions it
+     absolutely and stretches it to the full country block so any
+     click on the flag / chevron lands on this <select>. Do not
+     shrink it or change its position: the picker would break. */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* appearance / border / background / cursor / opacity inherited
+     from the library's own stylesheet. We only re-assert the few
+     properties the library depends on for the click area. */
+  border: 0;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  /* Allow the <select> to receive focus so keyboard users can still
+     open the country picker; the focus ring shows on the surrounding
+     .PhoneInput border via :focus-within above. */
+}
+
+.phone-number-field .PhoneInputCountrySelect:focus {
+  outline: none;
+}
+
+.phone-number-field .PhoneInputCountrySelectArrow {
+  /* Replace the library's rotated-border chevron with a clean
+     inline SVG. The library's arrow is built from CSS borders
+     which looks fine in isolation but clashes with PayPing's
+     line-icon vocabulary. We use a 1em box so it scales with the
+     surrounding font-size. */
+  width: 0.6em;
+  height: 0.6em;
+  border: 0 !important;
+  margin-left: var(--space-1);
+  transform: none;
+  opacity: 0.6;
+  /* Belt-and-braces: the chevron is purely decorative. The
+     underlying <select> (made position:absolute + 100%×100% above)
+     receives every click. If the chevron ever rendered above the
+     select in stacking order and intercepted the click, the picker
+     would silently stop working — this guarantees it never does. */
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.phone-number-field .PhoneInputCountryIcon {
+  /* Larger flag — 1em is the library default but it reads as
+     understated next to PayPing's 14–16px text. 1.15em brings it
+     closer to the form's visual weight without looking loud. */
+  width: 1.3em;
+  height: 1.15em;
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--color-avatar-ring);
+}
+
+.phone-number-field .PhoneInputCountryIconImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---- Number input (the <input> on the right) ------------------------- */
+
+.phone-number-field .PhoneInputInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  /* Strip the library's default input border — the unified border
+     lives on the surrounding .PhoneInput. */
+  border: 0;
+  outline: none;
+  background: transparent;
+  padding: var(--space-2) var(--space-3);
+  font-family: inherit;
+  font-size: var(--font-sm);
+  color: var(--color-text-heading);
+  /* Slight extra room on the left because the flag/select block
+     already provides the standard left padding. */
+  padding-left: var(--space-3);
+  border-top-right-radius: calc(var(--radius-sm) - 1px);
+  border-bottom-right-radius: calc(var(--radius-sm) - 1px);
+}
+
+.phone-number-field .PhoneInputInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+.phone-number-field .PhoneInputInput:focus {
+  outline: none;
+}
+
+.phone-number-field .PhoneInputInput:read-only {
+  cursor: not-allowed;
+}
+
+/* ---- Disabled state --------------------------------------------------- */
+
+.phone-number-field.is-disabled .PhoneInput {
+  background-color: var(--color-surface-subtle);
+  border-color: var(--color-border);
+}
+
+.phone-number-field.is-disabled .PhoneInputInput {
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.phone-number-field.is-disabled .PhoneInputCountry {
+  opacity: 0.7;
+}
+
+.phone-number-field.is-disabled .PhoneInputCountrySelect {
+  cursor: not-allowed;
+}
+
+/* ---- Error message slot (mirrors .form-error / .client-form-error) --- */
+
+.phone-number-field-error {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--font-xs);
+  color: var(--color-danger-text);
+  line-height: var(--leading-snug);
+}
+
+/* ---- Responsive ------------------------------------------------------- */
+
+@media (max-width: 480px) {
+  .phone-number-field .PhoneInputCountry {
+    padding-left: var(--space-2);
+  }
+  .phone-number-field .PhoneInputInput {
+    padding-left: var(--space-2);
+  }
+}

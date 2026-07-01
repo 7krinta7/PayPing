@@ -18,7 +18,17 @@ router.post("/register", registerRules, validate, async (req, res, next) => {
       throw new AppError(409, "User already exists");
     }
 
-    const user = new User({ email, password });
+    // `name` is collected by the registration UI but is not (yet) part
+    // of `registerRules`. It's enforced here — required + trimmed for
+    // new sign-ups — so existing rows (where the schema field is
+    // optional) keep loading cleanly without a migration.
+    const rawName = req.body?.name;
+    const name = typeof rawName === "string" ? rawName.trim() : "";
+    if (!name) {
+      throw new AppError(400, "name is required");
+    }
+
+    const user = new User({ email, password, name });
     await user.save();
 
     const token = jwt.sign(
@@ -27,7 +37,14 @@ router.post("/register", registerRules, validate, async (req, res, next) => {
       { expiresIn: "1d" }
     );
 
-    res.status(201).json({ token });
+    res.status(201).json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
   } catch (error) {
     next(error);
   }
@@ -54,7 +71,18 @@ router.post("/login", loginRules, validate, async (req, res, next) => {
       { expiresIn: "1d" }
     );
 
-    res.json({ token });
+    // Same response shape as /register so the frontend can hydrate
+    // `AuthContext.user` identically across both flows. `name` may be
+    // undefined for users who registered before the field existed —
+    // the frontend treats that as "no name" and falls back gracefully.
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name || "",
+        email: user.email
+      }
+    });
   } catch (error) {
     next(error);
   }

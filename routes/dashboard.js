@@ -30,11 +30,12 @@ router.get("/stats", auth, async (req, res, next) => {
       // Last 5 reminder events for the dashboard "Recent Activity" card.
       // Reuses the existing ReminderHistory collection and its populated
       // shape so the client gets invoice + client.name without an extra
-      // round-trip.
+      // round-trip. `invoiceNumber` is included so the card can surface
+      // the user-assigned reference next to the client name.
       ReminderHistory.find(userFilter)
         .populate({
           path: "invoice",
-          select: "_id amount client",
+          select: "_id amount client invoiceNumber",
           populate: { path: "client", select: "_id name" }
         })
         .sort({ sentAt: -1, createdAt: -1 })
