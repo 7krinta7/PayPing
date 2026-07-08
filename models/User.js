@@ -80,7 +80,7 @@ const UserSchema = new mongoose.Schema({
   notificationPreferences: {
     email: {
       type: Boolean,
-      default: false
+      default: true
     },
     whatsapp: {
       type: Boolean,
